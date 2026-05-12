@@ -629,17 +629,39 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
 .wk-preview-img-wrap .wk-dot4::before{border-left:1px solid var(--wgry)}
 .wk-preview-img-wrap .wk-dot4::after {border-bottom:1px solid var(--wgry)}
 
-/* Preview images (CSS crossfade) */
+/* Preview images — landscape fit inside square container (20px padding) */
 .wk-pvimg{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  object-fit:cover;
+  position:absolute;
+  left:20px;right:20px;
+  top:50%;transform:translateY(-50%);
+  width:calc(100% - 40px);
+  height:auto;
+  max-height:calc(100% - 40px);
+  object-fit:contain;
   filter:grayscale(1) brightness(.65);
   opacity:0;
   transition:opacity .35s cubic-bezier(.3,.1,.1,1);
   pointer-events:none;
 }
 .wk-pvimg.is-active{opacity:1}
+
+/* WORKS heading inside preview area (top-left of preview column) */
+.wk-preview-heading{
+  position:absolute;
+  left:calc(var(--wkcolumn)*.5 + var(--wkmargin));
+  top:var(--wkmargin);
+  pointer-events:none;
+}
+.wk-preview-heading-main{
+  font-family:'Space Mono',monospace;
+  font-size:24px;letter-spacing:-.04em;text-transform:uppercase;
+  color:var(--wfg);line-height:.9;
+}
+.wk-preview-heading-sub{
+  font-family:'Space Mono',monospace;
+  font-size:10px;color:var(--wlgy);
+  margin-top:1em;
+}
 
 /* Preview title — 3D rotated left of image wrap, with blur + scanline effects */
 .wk-preview-title{
@@ -822,7 +844,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
           <span class="wk-item-idx">#02</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン &amp; こぼ・かなえる III</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン &amp; こぼ・かなえる - III</p></div>
       </div>
 
       <div class="wk-item" data-idx="2" style="--i:2">
@@ -830,7 +852,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
           <span class="wk-item-idx">#03</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="wk-item-row2"><p class="wk-item-title">しぐれうい うい麦畑でつかまえて</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">しぐれうい - うい麦畑でつかまえて</p></div>
       </div>
 
       <div class="wk-item" data-idx="3" style="--i:3">
@@ -838,7 +860,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
           <span class="wk-item-idx">#04</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="wk-item-row2"><p class="wk-item-title">星街すいせい みちづれ</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">星街すいせい - みちづれ</p></div>
       </div>
 
       <div class="wk-item" data-idx="4" style="--i:4">
@@ -846,7 +868,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
           <span class="wk-item-idx">#05</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="wk-item-row2"><p class="wk-item-title">Nornis ジョハリ</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">Nornis - ジョハリ</p></div>
       </div>
 
       <div class="wk-item" data-idx="5" style="--i:5">
@@ -862,7 +884,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
           <span class="wk-item-idx">#07</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン 真夜中のドア</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン - 真夜中のドア〜stay with me〜 cover</p></div>
       </div>
 
       <div class="wk-item" data-idx="7" style="--i:7">
@@ -870,7 +892,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
           <span class="wk-item-idx">#08</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン め組の人 cover</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン - め組の人 cover</p></div>
       </div>
 
       <div class="wk-item" data-idx="8" style="--i:8">
@@ -878,7 +900,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
           <span class="wk-item-idx">#09</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="wk-item-row2"><p class="wk-item-title">REIN 自主制作</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">REIN - 自主制作</p></div>
       </div>
 
     </div>
@@ -886,6 +908,10 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
 
   <!-- RIGHT: preview panel -->
   <div class="wk-preview">
+    <div class="wk-preview-heading">
+      <div class="wk-preview-heading-main">Works</div>
+      <div class="wk-preview-heading-sub">9 Items</div>
+    </div>
     <div class="wk-preview-img-wrap">
       <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=85&w=800" alt="" loading="lazy">
       <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=85&w=800" alt="" loading="lazy">
