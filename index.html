@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>永久×バレット | TOKOSHIE×BULLET</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+ul,li{list-style:none}
+:focus{outline:none}
+:root{
+  --pink:#fe3e82;
+  --bg:#0a0a0a;
+  --white:#fff;
+  --gray:#707070;
+}
+html,body{
+  width:100%;height:100%;
+  overflow:hidden;
+  background:var(--bg);
+  color:var(--white);
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  cursor:auto;
+  user-select:none;-webkit-user-select:none;
+}
+body.js-cursor{cursor:none}
+body.pv-open{overflow:hidden}
+
+/* === カスタムカーソル === */
+#cursor{
+  position:fixed;top:-200px;left:-200px;
+  width:14px;height:14px;
+  border:1.5px solid rgba(255,255,255,.85);
+  border-radius:50%;
+  pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);
+  transition:width .18s,height .18s,background .18s,border-color .18s;
+  will-change:left,top;
+  mix-blend-mode:difference;
+}
+#cursor.big{
+  width:40px;height:40px;
+  border-color:var(--pink);
+  background:rgba(254,62,130,.15);
+  mix-blend-mode:normal;
+}
+
+/* === LOADING === */
+#loading{
+  position:fixed;inset:0;z-index:300;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:18px;
+  transition:opacity .6s .3s;
+}
+#loading.out{opacity:0;pointer-events:none}
+.load-txt{
+  font-family:Quantico,sans-serif;
+  font-size:18px;letter-spacing:6px;
+  color:var(--white);
+  animation:blink 350ms steps(1) infinite;
+}
+@keyframes blink{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+.load-bar{
+  width:200px;height:1px;
+  background:rgba(255,255,255,.15);
+  position:relative;overflow:hidden;
+}
+.load-bar::after{
+  content:'';position:absolute;inset:0;
+  background:var(--pink);
+  transform:translateX(-100%);
+  animation:loadFill 1.6s ease-in-out infinite;
+}
+@keyframes loadFill{
+  0%{transform:translateX(-100%)}
+  50%{transform:translateX(0)}
+  100%{transform:translateX(100%)}
+}
+.load-pct{
+  font-family:Quantico,sans-serif;
+  font-size:12px;letter-spacing:3px;color:rgba(255,255,255,.5);
+}
+
+/* === MAIN CANVAS === */
+#main-canvas{
+  position:fixed;inset:0;z-index:0;
+  width:100%;height:100%;
+  display:block;
+}
+
+/* === SECTIONS OVERLAY === */
+#secs{position:fixed;inset:0;z-index:20;pointer-events:none}
+.sec{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  will-change:opacity,transform;
+}
+.sec.vis{pointer-events:all}
+
+/* SEC 0: KV INFO */
+#s0{justify-content:flex-end;padding-bottom:14vh}
+.kv-title-svg{
+  display:block;width:min(440px,55vw);
+  filter:drop-shadow(0 0 30px rgba(254,62,130,.4));
+}
+.note{
+  margin-top:18px;text-align:center;
+  font-family:'Noto Serif JP',serif;
+  font-size:clamp(12px,1.3vw,15px);line-height:1.95;
+  color:rgba(255,255,255,.92);
+  text-shadow:0 0 10px rgba(0,0,0,.9);
+}
+.note a{color:rgba(255,255,255,.85);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4)}
+.note a:hover{color:var(--pink);border-color:var(--pink)}
+.note strong{color:var(--pink);font-weight:700}
+
+/* SEC 1: PV */
+#s1{gap:18px}
+.pv-wrap{
+  position:relative;width:min(620px,68vw);
+  aspect-ratio:16/9;overflow:hidden;
+  cursor:none;
+  box-shadow:0 0 50px rgba(0,0,0,.6);
+}
+.pv-wrap::before,.pv-wrap::after,
+.pv-c::before,.pv-c::after{
+  content:'';position:absolute;width:18px;height:18px;
+  border:1.5px solid rgba(255,255,255,.9);z-index:3;
+  transition:width .35s,height .35s,border-color .35s;
+}
+.pv-wrap::before{top:0;left:0;border-right:none;border-bottom:none}
+.pv-wrap::after{top:0;right:0;border-left:none;border-bottom:none}
+.pv-c::before{bottom:0;left:0;border-right:none;border-top:none}
+.pv-c::after{bottom:0;right:0;border-left:none;border-top:none}
+.pv-wrap:hover::before,.pv-wrap:hover::after,
+.pv-wrap:hover .pv-c::before,.pv-wrap:hover .pv-c::after{
+  width:32px;height:32px;border-color:var(--pink);
+}
+.pv-thumb{
+  display:block;width:100%;height:100%;object-fit:cover;
+  transition:transform .55s;background:#000;
+}
+.pv-wrap:hover .pv-thumb{transform:scale(1.05)}
+.pv-ov{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.42);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .3s;z-index:2;
+}
+.pv-wrap:hover .pv-ov{background:rgba(0,0,0,.18)}
+.play-btn{
+  width:66px;height:66px;border-radius:50%;
+  border:2px solid var(--pink);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .35s,box-shadow .35s;
+  background:rgba(0,0,0,.2);
+}
+.pv-wrap:hover .play-btn{
+  transform:scale(1.18);
+  box-shadow:0 0 25px rgba(254,62,130,.6);
+}
+.play-btn svg{width:22px;height:22px;fill:var(--pink);margin-left:3px}
+.pv-lbl{
+  font-family:Quantico,sans-serif;color:var(--pink);
+  font-size:12px;letter-spacing:5px;
+  text-shadow:0 0 8px rgba(0,0,0,.8);
+}
+
+/* SEC 2: Canvas側で表示 */
+#s2{display:none}
+
+/* SEC 3: INFO */
+#s3{gap:22px;padding:0 6vw;text-align:center}
+.info-head{
+  font-family:Quantico,sans-serif;
+  font-size:clamp(20px,2.6vw,34px);
+  letter-spacing:12px;color:var(--white);
+  text-shadow:0 0 18px rgba(254,62,130,.55), 0 0 4px rgba(0,0,0,.9);
+}
+.info-divider{
+  width:1px;height:56px;
+  background:linear-gradient(to bottom,transparent,var(--pink),transparent);
+}
+.info-body{
+  font-family:'Noto Serif JP',serif;
+  font-size:clamp(13px,1.35vw,16px);line-height:2.1;
+  color:rgba(255,255,255,.95);
+  text-shadow:0 0 8px rgba(0,0,0,.8);
+}
+.info-body a{color:rgba(220,220,255,.85);text-decoration:none;border-bottom:1px solid rgba(220,220,255,.4)}
+.info-body a:hover{color:var(--pink);border-color:var(--pink)}
+.info-body strong{color:var(--pink);font-weight:700}
+.info-en{
+  font-family:'Noto Serif JP',serif;
+  font-size:clamp(11px,1.1vw,13px);line-height:2;
+  color:rgba(255,255,255,.55);
+  text-shadow:0 0 6px rgba(0,0,0,.8);
+}
+
+/* SEC 4: STAFF */
+#s4{gap:24px;padding-bottom:70px}
+.sbox{text-align:center}
+.srole{
+  font-family:Quantico,sans-serif;font-size:11px;
+  letter-spacing:5px;color:var(--gray);margin-bottom:12px;
+  text-shadow:0 0 4px rgba(0,0,0,.8);
+}
+.sja{
+  font-family:'Noto Serif JP',serif;
+  font-size:clamp(22px,2.9vw,34px);letter-spacing:7px;
+  text-shadow:0 0 12px rgba(0,0,0,.9);
+}
+.sen{
+  font-family:Quantico,sans-serif;font-size:13px;
+  letter-spacing:4px;color:rgba(255,255,255,.55);margin-top:8px;
+  text-shadow:0 0 6px rgba(0,0,0,.8);
+}
+.ssns{display:flex;gap:22px;justify-content:center;margin-top:16px}
+.ssns a{
+  font-family:Quantico,sans-serif;font-size:12px;letter-spacing:3px;
+  color:rgba(255,255,255,.7);text-decoration:none;transition:color .2s;
+  padding:6px 12px;border:1px solid rgba(255,255,255,.25);
+  text-shadow:0 0 4px rgba(0,0,0,.8);
+}
+.ssns a:hover{color:var(--pink);border-color:var(--pink)}
+.slabs{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.slabs span{
+  font-family:Quantico,sans-serif;font-size:11px;
+  letter-spacing:3px;color:rgba(255,255,255,.4);
+  text-shadow:0 0 4px rgba(0,0,0,.8);
+}
+
+/* === SCROLL/TOP BUTTONS === */
+#sb,#tb{
+  position:fixed;bottom:48px;left:50%;transform:translateX(-50%);
+  z-index:50;background:none;border:none;cursor:none;color:var(--white);
+  display:flex;flex-direction:column;align-items:center;
+  padding:8px 14px;transition:opacity .35s .25s;
+  text-shadow:0 0 6px rgba(0,0,0,.8);
+}
+.hide{opacity:0!important;pointer-events:none!important}
+.show{opacity:1;pointer-events:all}
+#sb::before,#sb::after{
+  content:'';display:block;
+  border:solid transparent;border-width:7px 5px 0;border-top-color:var(--white);
+  filter:drop-shadow(0 0 3px rgba(0,0,0,.8));
+}
+#sb::before{order:2;margin:8px 0 5px}
+#sb::after{order:3}
+.sl{order:1}
+#tb::before,#tb::after{
+  content:'';display:block;
+  border:solid transparent;border-width:0 5px 7px;border-bottom-color:var(--white);
+  filter:drop-shadow(0 0 3px rgba(0,0,0,.8));
+}
+#tb::before{order:0}
+#tb::after{order:1;margin:5px 0 8px}
+.tl{order:2}
+.gt{font-family:Quantico,sans-serif;font-size:18px;letter-spacing:-1px;display:inline-flex}
+.gt span{display:inline-block;will-change:transform}
+.gt span:nth-child(1){animation:g1 1.72s .5s steps(1) infinite}
+.gt span:nth-child(2){animation:g2 3.44s 1s steps(1) infinite}
+.gt span:nth-child(3){animation:g3 5.16s 1.5s steps(1) infinite}
+.gt span:nth-child(4){animation:g4 6.88s 2s steps(1) infinite}
+.gt span:nth-child(5){animation:g5 8.6s 2.5s steps(1) infinite}
+.gt span:nth-child(6){animation:g6 10.32s 3s steps(1) infinite}
+@keyframes g1{0%,49%,59%{transform:none}51%{transform:translate(-3%,10%)}55%{transform:translate(5%,-20%) scale(1.25)}}
+@keyframes g2{0%,49%,59%{transform:none}51%{transform:translate(-5%,10%)}55%{transform:translate(5%,-20%) scale(1.25)}}
+@keyframes g3{0%,49%,59%{transform:none}51%{transform:translate(-8%,10%)}55%{transform:translate(5%,-20%) scale(1.25)}}
+@keyframes g4{0%,49%,59%{transform:none}51%{transform:translate(-10%,10%)}55%{transform:translate(5%,-20%) scale(1.25)}}
+@keyframes g5{0%,49%,59%{transform:none}51%{transform:translate(-13%,10%)}55%{transform:translate(5%,-20%) scale(1.25)}}
+@keyframes g6{0%,49%,59%{transform:none}51%{transform:translate(-15%,10%)}55%{transform:translate(5%,-20%) scale(1.25)}}
+
+/* === METER === */
+#meter{position:fixed;bottom:24px;right:24px;z-index:50;user-select:none;width:74px;height:74px}
+.msv{width:74px;height:74px;display:block}
+.mo{fill:none;stroke:rgba(255,255,255,.3);stroke-width:1}
+.mi{fill:none;stroke:rgba(255,255,255,.15);stroke-width:1}
+.mp{
+  fill:none;stroke:var(--white);stroke-width:2.5;
+  stroke-dasharray:220;stroke-dashoffset:220;
+  stroke-linecap:round;
+  transform:rotate(-90deg);transform-origin:50% 50%;
+  transition:stroke-dashoffset .7s cubic-bezier(.4,0,.2,1);
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.6));
+}
+.mlabel{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:Quantico,sans-serif;font-size:12px;color:var(--white);
+  display:flex;align-items:center;gap:2px;white-space:nowrap;
+  text-shadow:0 0 4px rgba(0,0,0,.8);
+}
+.mn{display:inline-block;width:9px;height:13px;overflow:hidden;position:relative}
+.mni{position:absolute;top:0;left:0;display:flex;flex-direction:column;line-height:13px;transition:transform .4s cubic-bezier(.4,0,.2,1)}
+
+/* === DOTS === */
+#dots{
+  position:fixed;right:11px;top:50%;transform:translateY(-50%);
+  z-index:50;display:flex;flex-direction:column;gap:10px;pointer-events:none;
+}
+.dot{
+  width:4px;height:4px;border-radius:50%;
+  background:rgba(255,255,255,.3);
+  transition:background .4s,transform .4s;
+}
+.dot.on{background:var(--pink);transform:scale(1.8);box-shadow:0 0 8px var(--pink)}
+
+/* === FOOTER === */
+footer{
+  position:fixed;bottom:0;left:0;width:100%;z-index:50;
+  padding:10px;text-align:center;
+  opacity:0;transition:opacity .5s;pointer-events:none;
+}
+body[data-sec="4"] footer{opacity:1}
+footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);text-shadow:0 0 4px rgba(0,0,0,.8)}
+
+/* === BANNERS === */
+#bnr{position:fixed;left:0;bottom:18px;z-index:50;display:flex;gap:4px}
+.bi{width:175px}
+.bi a{display:block;transition:opacity .2s,transform .25s;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.bi a:hover{opacity:.85;transform:translateY(-2px)}
+.bi-inner{
+  background:rgba(20,20,20,.85);
+  border:1px solid rgba(255,255,255,.15);
+  padding:8px 10px;
+  font-family:'Noto Serif JP',serif;color:var(--white);font-size:12px;line-height:1.4;
+}
+.bi-inner .ja{font-weight:700;letter-spacing:1px}
+.bi-inner .en{font-family:Quantico,sans-serif;font-size:9px;color:rgba(255,255,255,.5);letter-spacing:1px;margin-top:2px}
+
+/* === PV MODAL === */
+#modal{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.85);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .4s;
+}
+#modal.open{opacity:1;pointer-events:all}
+.mbox{position:relative;width:90%;max-width:780px}
+.mvid{
+  position:relative;aspect-ratio:16/9;
+  box-shadow:0 0 50px 12px rgba(255,255,255,.15);
+  background:#000;
+}
+.mvid iframe{position:absolute;inset:0;width:100%;height:100%;display:block;border:none}
+.mbox::before,.mbox::after,
+.mcb::before,.mcb::after{
+  content:'';position:absolute;width:22px;height:22px;
+  border:1.5px solid rgba(255,255,255,.85);z-index:2;
+}
+.mbox::before{top:-3px;left:-3px;border-right:none;border-bottom:none}
+.mbox::after{top:-3px;right:-3px;border-left:none;border-bottom:none}
+.mcb::before{bottom:-3px;left:-3px;border-right:none;border-top:none}
+.mcb::after{bottom:-3px;right:-3px;border-left:none;border-top:none}
+#mclose{
+  display:block;margin:26px auto 0;
+  background:none;border:none;cursor:none;
+  font-family:Quantico,sans-serif;font-size:15px;color:var(--white);
+  position:relative;padding-top:24px;letter-spacing:3px;
+  transition:color .2s;
+}
+#mclose::before,#mclose::after{
+  content:'';position:absolute;top:0;left:50%;
+  width:34px;height:2px;background:var(--white);
+  transition:background .2s;
+}
+#mclose::before{transform:translate(-50%) rotate(-45deg)}
+#mclose::after{transform:translate(-50%) rotate(45deg)}
+#mclose:hover{color:var(--pink)}
+#mclose:hover::before,#mclose:hover::after{background:var(--pink)}
+
+/* === WARN === */
+#warn{display:none;position:fixed;inset:0;z-index:999;background:var(--bg);align-items:center;justify-content:center;text-align:center;padding:20px}
+@media(max-width:580px){#warn{display:flex}}
+#warn p{font-family:Quantico,sans-serif;font-size:15px;letter-spacing:2px;line-height:1.9;color:var(--white)}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+
+<div id="loading">
+  <p class="load-txt">LOADING</p>
+  <div class="load-bar"></div>
+  <p class="load-pct" id="load-pct">0%</p>
+</div>
+
+<canvas id="main-canvas"></canvas>
+<video id="bg-video" src="tokoshie-assets/background-pv.mp4"
+       autoplay muted loop playsinline
+       style="position:absolute;visibility:hidden;pointer-events:none;width:1px;height:1px;top:0;left:0">
+</video>
+
+<header>
+  <h1 style="font-size:0;line-height:0">
+    <a class="logo-a" href="#" id="logo-home" aria-label="TOKOSHIE×BULLET">
+      <svg class="logo-svg" viewBox="0 0 220 40" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="22" fill="#fff" font-family="Quantico,sans-serif" font-size="18" font-weight="700" letter-spacing="1.5">TOK</text>
+        <circle cx="50" cy="16" r="3.5" fill="none" stroke="#fff" stroke-width="1.5"/>
+        <line x1="50" y1="12.5" x2="50" y2="19.5" stroke="#fff" stroke-width="1.5"/>
+        <line x1="46.5" y1="16" x2="53.5" y2="16" stroke="#fff" stroke-width="1.5"/>
+        <text x="58" y="22" fill="#fff" font-family="Quantico,sans-serif" font-size="18" font-weight="700" letter-spacing="1.5">SHIE</text>
+        <text x="102" y="22" fill="#fff" font-family="Quantico,sans-serif" font-size="18" font-weight="700">×</text>
+        <text x="118" y="22" fill="#fff" font-family="Quantico,sans-serif" font-size="18" font-weight="700" letter-spacing="1.5">BULLET</text>
+        <text x="0" y="35" fill="#fff" font-family="'Noto Serif JP',serif" font-size="9" letter-spacing="2">永久×バレット</text>
+      </svg>
+    </a>
+  </h1>
+</header>
+
+<div id="secs">
+  <section class="sec" id="s0">
+    <svg class="kv-title-svg" viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+      <text x="0" y="100" fill="#fff" font-family="'Noto Serif JP',serif" font-weight="900" font-size="80" letter-spacing="6">永久</text>
+      <text x="155" y="100" fill="#fff" font-family="Quantico,sans-serif" font-weight="700" font-size="60">×</text>
+      <text x="220" y="100" fill="#fff" font-family="'Noto Serif JP',serif" font-weight="900" font-size="80" letter-spacing="6">バレット</text>
+      <text x="300" y="160" text-anchor="middle" fill="#fff" font-family="Quantico,sans-serif" font-weight="700" font-size="20" letter-spacing="10" opacity="0.85">TOKOSHIE × BULLET</text>
+    </svg>
+    <p class="note">
+      <a href="https://magazine.yanmaga.jp/" target="_blank" rel="noopener">ヤングマガジン</a>・<a href="https://afternoon.kodansha.co.jp/goodafternoon/" target="_blank" rel="noopener">good!アフタヌーン</a>にて<br>
+      <strong>同時連載開始</strong>
+    </p>
+  </section>
+
+  <section class="sec" id="s1">
+    <div class="pv-wrap" id="pv-btn">
+      <img class="pv-thumb" id="pv-thumb-img"
+           src="tokoshie-assets/content-1-pv_thumbnail.jpg"
+           alt="PV">
+      <div class="pv-ov">
+        <div class="play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+        </div>
+      </div>
+      <div class="pv-c"></div>
+    </div>
+    <p class="pv-lbl">ORIGINAL PV — NOW STREAMING</p>
+  </section>
+
+  <section class="sec" id="s2"></section>
+
+  <section class="sec" id="s3">
+    <p class="info-head">INFORMATION</p>
+    <div class="info-divider"></div>
+    <div class="info-body">
+      <a href="https://magazine.yanmaga.jp/" target="_blank" rel="noopener">ヤングマガジン</a>・<a href="https://afternoon.kodansha.co.jp/goodafternoon/" target="_blank" rel="noopener">good!アフタヌーン</a>にて<br>
+      <strong>同時連載開始</strong>
+    </div>
+    <p class="info-en">The comics will be serialized in<br>"Weekly Young Magazine" and "good!Afternoon",<br>and will be released at the same time.</p>
+  </section>
+
+  <section class="sec" id="s4">
+    <div class="sbox">
+      <p class="srole">ORIGINAL / 原作</p>
+      <p class="sja">モリオン航空</p>
+      <p class="sen">morion airline</p>
+      <div class="ssns">
+        <a href="https://twitter.com/tokoshie_morion" target="_blank" rel="noopener">TWITTER</a>
+        <a href="https://www.instagram.com/morion_airline/" target="_blank" rel="noopener">INSTAGRAM</a>
+      </div>
+    </div>
+    <div class="slabs">
+      <span>KODANSHA</span><span>BANDAI NAMCO Arts</span><span>8million</span>
+    </div>
+  </section>
+</div>
+
+<button id="sb" class="show"><span class="sl gt"><span>S</span><span>c</span><span>r</span><span>o</span><span>l</span><span>l</span></span></button>
+<button id="tb" class="hide"><span class="tl gt"><span>T</span><span>O</span><span>P</span></span></button>
+
+<div id="meter">
+  <svg class="msv" viewBox="0 0 74 74"><circle class="mo" cx="37" cy="37" r="35"/><circle class="mi" cx="37" cy="37" r="32"/><circle class="mp" id="mprog" cx="37" cy="37" r="35"/></svg>
+  <div class="mlabel"><span class="mn"><span class="mni" id="mnum">0</span></span>/<span>4</span></div>
+</div>
+
+<div id="dots"><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+<footer><small>©Tokoshie Bullet Project</small></footer>
+
+<div id="bnr">
+  <div class="bi"><a href="https://tokoshie-bullet.com/comic/shin-minato" target="_blank" rel="noopener"><div class="bi-inner"><div class="ja">新湊攻防戦</div><div class="en">the battle at Shin Minato</div></div></a></div>
+  <div class="bi"><a href="https://tokoshie-bullet.com/comic/kaijyu-gakuen" target="_blank" rel="noopener"><div class="bi-inner"><div class="ja">怪獣学園</div><div class="en">SCHOOL OF WILD THINGS</div></div></a></div>
+</div>
+
+<div id="modal"><div class="mbox"><div class="mvid" id="mvid"></div><div class="mcb"></div><button id="mclose">CLOSE</button></div></div>
+<div id="warn"><p>画面が小さいため<br>表示することができません。</p></div>
+
+<script src="tokoshie-assets/three.min.js"></script>
+<script>
+/* ============================================================
+   TOKOSHIE×BULLET 完全再現 v3
+   実サイト解析シェーダー + 5パスポストプロセスレンダリング
+============================================================ */
+(function(){'use strict';
+
+const BASE = 'assets/';
+
+// =====================================
+// GLSLシェーダー — 実サイト script.js より抽出
+// =====================================
+
+// 共通頂点 (Shader 0)
+const VERT_SIMPLE = `
+varying vec2 vUv;
+void main(void) {
+  vec3 pos = position;
+  vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+  gl_Position = projectionMatrix * mvPosition;
+  vUv = uv;
+}`;
+
+// ロゴ頂点 (Shader 42) — logoTime でZ移動
+const VERT_LOGO = `
+uniform float logoTime;
+varying vec2 vUv;
+void main(void) {
+  vec3 pos = position;
+  pos.z += -(logoTime - 0.5) * 0.15;
+  vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+  gl_Position = projectionMatrix * mvPosition;
+  vUv = uv;
+}`;
+
+// ダスト頂点 (Shader 40) — instanced sprite
+const VERT_DUST = `
+attribute vec3 offsetPos;
+attribute float num;
+attribute vec2 texOffset;
+uniform float time;
+varying vec2 vUv;
+void main( void ) {
+  vec3 pos = position;
+  vec3 oPos = offsetPos;
+  float t = time * 0.5;
+  oPos += vec3( -t * 3.0, sin( t * 5.0 + num ) * 0.1 - t, oPos.x );
+  oPos.xy = mod( oPos.xy, 1.0 ) - 0.5;
+  pos += oPos;
+  vec4 mvPosition = modelViewMatrix * vec4( pos, 1.0 );
+  gl_Position = projectionMatrix * mvPosition;
+  vUv = vec2( uv.x, uv.y );
+  vUv += texOffset;
+  vUv *= 0.5;
+}`;
+
+// KVノイズ (Shader 4) — RGB分離ブロックグリッチ
+const FRAG_KV_NOISE = `
+uniform sampler2D tex;
+uniform sampler2D emitterTex;
+uniform sampler2D noiseTex;
+uniform float time;
+uniform float monsterVisibility;
+uniform float emitter;
+varying vec2 vUv;
+void main(void) {
+  vec2 uv = vec2(vUv.x, 1.0 - vUv.y);
+  vec2 opacity = vec2( 1.0 );
+  vec2 totalNHigh;
+  vec2 totalNLow;
+  float monsterVisibilityInv = 1.0 - monsterVisibility;
+  if( monsterVisibility < 1.0 ) {
+    float t = floor(time * 20.0) / 20.0;
+    vec2 nuv1 = uv;
+    vec2 n1res = vec2( 120.0 * floor(monsterVisibilityInv * 13.0) / 13.0 );
+    nuv1.x += sin( floor(nuv1.y * n1res.y) / n1res.y * 30.0 ) * 0.3;
+    nuv1 = floor( nuv1 * n1res ) / n1res;
+    nuv1 += t;
+    vec2 n1 = texture2D( noiseTex, nuv1 ).xy - 0.5;
+    vec2 n1L = sign( n1 ) * step( 0.3 * monsterVisibility, abs( n1 ) );
+    vec2 nuv2 = uv;
+    vec2 n2res = vec2( 1.4, 19.0 );
+    nuv2 = floor( nuv2 * n2res ) / n2res;
+    nuv2 += t;
+    vec2 n2 = texture2D( noiseTex, nuv2 * 3.0 ).xy - 0.5;
+    vec2 n2L = sign( n2 ) * step( 0.25 * monsterVisibility, abs( n2 ) );
+    vec2 nuv3 = uv;
+    vec2 n3res = vec2( 1.5, 1.5 );
+    nuv3 = floor( nuv3 * n3res ) / n3res;
+    nuv3 += t;
+    vec2 n3 = texture2D( noiseTex, nuv3 ).xy - 0.5;
+    vec2 n3L = sign( n3 ) * step( 0.35 * monsterVisibility, abs( n3 ) );
+    totalNLow = n1L * 0.02 + n2L * 0.01 + n3L * 0.01;
+    totalNHigh = n1 * 0.02 + n2 * 0.01 + n3 * 0.01;
+    uv += totalNLow;
+    float transparentLine = 0.001 - monsterVisibilityInv * 0.0015;
+    opacity.x *= step( abs( totalNLow.x ) * monsterVisibilityInv, transparentLine );
+    opacity.y *= step( abs( totalNLow.y ) * monsterVisibilityInv, transparentLine );
+  }
+  vec2 ruv = uv + totalNLow.x;
+  vec2 guv = uv + totalNLow.y;
+  vec2 buv = uv + totalNLow.y;
+  vec4 col;
+  col.ra += texture2D(tex, ruv).ra;
+  col.ga += texture2D(tex, guv).ga;
+  col.ba += texture2D(tex, buv).ba;
+  col.rgb += texture2D(emitterTex, ruv).rgb * ( 0.3 + emitter * ( ( sin( time ) * 0.5 + 0.5 ) * vec3( 1.0, 1.0, 0.3 ) ) );
+  col.xyz *= 1.0 - vec3( totalNLow.y, totalNLow.x, totalNLow.x );
+  col.a /= 3.0;
+  col.w *= ( opacity.x + opacity.y ) / 2.0;
+  gl_FragColor = col;
+}`;
+
+// 背景 (Shader 23)
+const FRAG_BG = `
+uniform sampler2D tex;
+uniform float monsterVisibility;
+uniform float sceneSelector;
+varying vec2 vUv;
+void main(void) {
+  vec2 uv = vec2(vUv.x, 1.0 - vUv.y);
+  vec4 c = texture2D(tex, uv);
+  c = c * ( 0.7 + (1.0 - monsterVisibility) * 0.3 ) + monsterVisibility * 0.3;
+  c.xyz *= 0.95;
+  // darken sky proportionally as 3D scene becomes dominant
+  c.xyz *= mix(1.0, 0.22, sceneSelector);
+  gl_FragColor = c;
+}`;
+
+// KVエフェクト (Shader 9)
+const FRAG_KV_EFFECT = `
+uniform float time;
+uniform sampler2D tex;
+varying vec2 vUv;
+#define PI 3.14159265359
+void main(void) {
+  float t = time * 0.1;
+  float o1 = mod( t, 1.0 );
+  float o2 = mod( t + 0.5, 1.0 );
+  vec2 uv1 = vec2(vUv.x + o1 * 0.15, 1.0 - vUv.y);
+  vec2 uv2 = vec2(vUv.x + o2 * 0.15, 1.0 - vUv.y);
+  vec4 c;
+  c.xyz = vec3( 1.0 );
+  c.w = mix( texture2D(tex,uv1).w, texture2D(tex,uv2).w, (cos(t*2.0*PI)*0.5+0.5) ) * 0.4;
+  gl_FragColor = c;
+}`;
+
+// ロゴ (Shader 43)
+const FRAG_LOGO = `
+uniform sampler2D tex;
+uniform sampler2D noise;
+uniform float scrollVelocity;
+uniform float sceneSelector;
+uniform float logoTime;
+uniform float time;
+uniform float logoVisibility;
+uniform float isSP;
+varying vec2 vUv;
+#define PI 3.14159265359
+void main(void) {
+  vec2 uv = vec2(vUv.x, 1.0 - vUv.y);
+  vec2 tuv = uv;
+  uv *= 0.5;
+  vec2 opacity = vec2( 1.0 );
+  vec2 totalNHigh;
+  vec2 totalNLow;
+  float logoVis = mix( logoVisibility, 1.0, isSP );
+  float logoVisInv = 1.0 - logoVis;
+  if( logoVis < 1.0 ) {
+    float t = floor(time * 20.0) / 20.0;
+    vec2 nuv1 = uv;
+    vec2 n1res = vec2( 120.0 * floor(logoVisInv * 13.0) / 13.0 );
+    nuv1.x += sin( floor(nuv1.y * n1res.y) / n1res.y * 30.0 ) * 0.3;
+    nuv1 = floor( nuv1 * n1res ) / n1res;
+    nuv1 += t;
+    vec2 n1 = texture2D( noise, nuv1 ).xy - 0.5;
+    vec2 n1L = sign( n1 ) * step( 0.3 * logoVis, abs( n1 ) );
+    vec2 nuv2 = uv;
+    vec2 n2res = vec2( 1.4, 19.0 );
+    nuv2 = floor( nuv2 * n2res ) / n2res;
+    nuv2 += t;
+    vec2 n2 = texture2D( noise, nuv2 * 3.0 ).xy - 0.5;
+    vec2 n2L = sign( n2 ) * step( 0.25 * logoVis, abs( n2 ) );
+    vec2 nuv3 = uv;
+    vec2 n3res = vec2( 1.5, 1.5 );
+    nuv3 = floor( nuv3 * n3res ) / n3res;
+    nuv3 += t;
+    vec2 n3 = texture2D( noise, nuv3 ).xy - 0.5;
+    vec2 n3L = sign( n3 ) * step( 0.35 * logoVis, abs( n3 ) );
+    totalNLow = n1L * 0.02 + n2L * 0.01 + n3L * 0.01;
+    totalNHigh = n1 * 0.02 + n2 * 0.01 + n3 * 0.01;
+    uv += totalNLow;
+    float transparentLine = 0.001 - logoVisInv * 0.0015;
+    opacity.x *= step( abs( totalNLow.x ) * logoVisInv, transparentLine );
+    opacity.y *= step( abs( totalNLow.y ) * logoVisInv, transparentLine );
+  }
+  vec2 nuv = tuv + totalNLow.x;
+  vec4 col;
+  col += texture2D(tex, nuv);
+  col.xyz *= 1.0 - vec3( totalNLow.y, totalNLow.x, totalNLow.x );
+  col.a *= smoothstep( 0.0, 0.95, sin( logoTime * PI ) );
+  col.w *= ( opacity.x + opacity.y ) / 2.0;
+  col.xyz *= 0.94;
+  gl_FragColor = col;
+}`;
+
+// モリオン航空 (Shader 26) — ノイズベースライン展開
+const FRAG_MORION = `
+uniform sampler2D tex;
+uniform sampler2D lineTex;
+uniform sampler2D noiseTex;
+uniform float morionVisibility;
+uniform float time;
+varying vec2 vUv;
+void main(void) {
+  vec2 uv = vec2(vUv.x, 1.0 - vUv.y);
+  vec4 line = texture2D( lineTex, uv );
+  vec4 c;
+  vec3 noise = texture2D( noiseTex, uv * vec2( 1.4, 0.1 ) ).xyz;
+  float fadeNoise = -noise.x - 0.02 + min( 1.0, morionVisibility * 0.7 );
+  float lineFade = smoothstep( -0.02, 0.0, fadeNoise );
+  c += line * lineFade;
+  c = mix( c, texture2D(tex, uv) * vec4(1.0,1.0,1.0,0.7), smoothstep(0.0, 0.6, (max(1.0, morionVisibility) - 1.0)) );
+  gl_FragColor = c;
+}`;
+
+// infoBackText スクロール展開 (Shader 37)
+const FRAG_INFO_BACK_TEXT = `
+uniform sampler2D tex;
+uniform float infoBackTextVisibility;
+varying vec2 vUv;
+void main(void) {
+  float offset = 1.0 - infoBackTextVisibility;
+  vec2 uv = vec2(vUv.x, (1.0 - vUv.y) + offset);
+  vec4 c = texture2D(tex, uv);
+  c.w *= step(uv.y, 1.0);
+  gl_FragColor = c;
+}`;
+
+// 汎用表示 (Shader 6)
+const FRAG_DISPLAY = `
+uniform sampler2D tex;
+uniform float displayVisibility;
+varying vec2 vUv;
+void main(void) {
+  vec2 uv = vec2(vUv.x, 1.0 - vUv.y);
+  vec4 c = texture2D( tex, uv );
+  c.w *= displayVisibility;
+  gl_FragColor = c;
+}`;
+
+// ダスト (Shader 41)
+const FRAG_DUST = `
+uniform sampler2D tex;
+uniform float monsterVisibility;
+varying vec2 vUv;
+void main( void ) {
+  vec4 c = texture2D( tex, vUv );
+  c.w *= monsterVisibility;
+  gl_FragColor = c;
+}`;
+
+// TEASERオーバーレイ頂点 — instanced billboard (実サイトから抽出)
+const VERT_TEASER = `
+attribute vec3 offsetPos;
+attribute vec3 randomOffset;
+attribute vec2 offsetUV;
+attribute float fadeNum;
+attribute float visibility;
+uniform sampler2D noiseTex;
+uniform float overlayVisibility;
+uniform float opacity;
+varying vec2 vUv;
+varying float vAlpha;
+void main( void ) {
+  vec3 pos = position;
+  pos += offsetPos + randomOffset;
+  vec4 mvPosition = modelViewMatrix * vec4( pos, 1.0 );
+  gl_Position = projectionMatrix * mvPosition;
+  float n = texture2D( noiseTex, vec2(offsetPos.x * 0.3 + 0.5, offsetPos.y * 0.3 + 0.5) + overlayVisibility * 0.1 ).r;
+  vAlpha = smoothstep( 0.7, 0.8, n + smoothstep( 0.5, 1.0, overlayVisibility < 1.0 ? overlayVisibility : 1.0 - (overlayVisibility - 1.0) ) ) * visibility;
+  vAlpha *= opacity;
+  vUv = uv;
+  vUv += offsetUV;
+  vUv /= 2.0;
+}`;
+
+// TEASERオーバーレイフラグメント（dots用 - RGBA透明）
+const FRAG_TEASER = `
+uniform sampler2D tex;
+varying vec2 vUv;
+varying float vAlpha;
+void main( void ) {
+  vec4 c = texture2D( tex, vUv );
+  c.w *= vAlpha;
+  gl_FragColor = c;
+}`;
+
+// TEASERキャラクター用（輝度ベース透過 — indexed PNG白背景を除去）
+const FRAG_TEASER_CHAR = `
+uniform sampler2D tex;
+varying vec2 vUv;
+varying float vAlpha;
+void main( void ) {
+  vec4 c = texture2D( tex, vUv );
+  float lum = dot(c.rgb, vec3(0.299, 0.587, 0.114));
+  c.w = (1.0 - smoothstep(0.78, 0.93, lum)) * vAlpha;
+  gl_FragColor = c;
+}`;
+
+// =============================================
+// ポストプロセスシェーダー
+// =============================================
+
+// フルスクリーンクワッド頂点
+const VERT_POST = `
+varying vec2 vUv;
+void main() {
+  gl_Position = vec4(position, 1.0);
+  vUv = uv;
+}`;
+
+// KV合成 (Shader 44) — backPVTex + isBlue + スキャンライン + ノイズ境界
+const FRAG_COMPOSITE = `
+varying vec2 vUv;
+uniform float time;
+uniform sampler2D sceneTex;
+uniform sampler2D backPVTex;
+uniform sampler2D backPVTexBlue;
+uniform sampler2D noiseTex;
+uniform float windowAspect;
+uniform float backPVAspect;
+uniform float sceneSelector;
+uniform float isPC;
+uniform float isBlue;
+uniform vec2 cursorPos;
+void main(){
+  vec4 scene = texture2D(sceneTex, vUv);
+  vec4 c;
+  if( sceneSelector != 1.0 ) {
+    vec2 uv = vUv;
+    uv -= 0.5;
+    uv *= 0.9 + ( 1.0 - isPC ) * 0.1;
+    uv.x *= windowAspect;
+    vec2 squareUV = uv * 0.6;
+    uv.x /= backPVAspect;
+    uv.xy -= uv * 0.1 * smoothstep( 0.1, 0.8, length( uv ) ) * isPC;
+    uv += 0.5;
+    squareUV *= 0.9;
+    squareUV += 0.5;
+    uv -= cursorPos * 0.01 * isPC;
+    uv = mod( uv, 1.0 );
+    vec4 pv = texture2D(backPVTex, uv) * vec4( 0.80, 0.85, 0.95, 1.0 ) * 1.0;
+    pv *= ( 1.0 + sin( uv.y * 1500.0 - time * 10.0 ) ) * 0.5 * 0.2 + 0.8;
+    vec3 noise = texture2D( noiseTex, squareUV ).xyz;
+    float fadeNoise = -noise.x - 0.05 + sceneSelector * 1.05;
+    float selector = smoothstep( -0.02, 0.0, fadeNoise );
+    float line = max( 0.0, 1.0 - smoothstep( 0.0, -0.02, fadeNoise ) ) * (1.0 - selector) * -10.0;
+    c = mix( pv, scene, selector );
+    c.xyz += line;
+  } else {
+    c = scene;
+  }
+  gl_FragColor = c;
+}`;
+
+// ブルーム閾値 (Shader 45)
+const FRAG_BLOOM_THRESH = `
+varying vec2 vUv;
+uniform sampler2D backbuffer;
+uniform float threshold;
+void main() {
+  vec3 c = texture2D( backbuffer, vUv ).xyz * 1.1;
+  vec3 f;
+  f.x = max(0.0, c.x - threshold);
+  f.y = max(0.0, c.y - threshold);
+  f.z = max(0.0, c.z - threshold);
+  f *= 10.0;
+  gl_FragColor = vec4(f, 1.0);
+}`;
+
+// ガウシアンブラー水平
+const FRAG_BLUR_H = `
+varying vec2 vUv;
+uniform sampler2D backbuffer;
+uniform vec2 resolution;
+void main() {
+  vec2 t = vec2(1.0) / resolution;
+  vec4 c = vec4(0.0);
+  c += texture2D(backbuffer, vUv + vec2(-4.0,0.0)*t) * 0.0162;
+  c += texture2D(backbuffer, vUv + vec2(-3.0,0.0)*t) * 0.0540;
+  c += texture2D(backbuffer, vUv + vec2(-2.0,0.0)*t) * 0.1215;
+  c += texture2D(backbuffer, vUv + vec2(-1.0,0.0)*t) * 0.1945;
+  c += texture2D(backbuffer, vUv                   ) * 0.2270;
+  c += texture2D(backbuffer, vUv + vec2( 1.0,0.0)*t) * 0.1945;
+  c += texture2D(backbuffer, vUv + vec2( 2.0,0.0)*t) * 0.1215;
+  c += texture2D(backbuffer, vUv + vec2( 3.0,0.0)*t) * 0.0540;
+  c += texture2D(backbuffer, vUv + vec2( 4.0,0.0)*t) * 0.0162;
+  gl_FragColor = c;
+}`;
+
+// ガウシアンブラー垂直
+const FRAG_BLUR_V = `
+varying vec2 vUv;
+uniform sampler2D backbuffer;
+uniform vec2 resolution;
+void main() {
+  vec2 t = vec2(1.0) / resolution;
+  vec4 c = vec4(0.0);
+  c += texture2D(backbuffer, vUv + vec2(0.0,-4.0)*t) * 0.0162;
+  c += texture2D(backbuffer, vUv + vec2(0.0,-3.0)*t) * 0.0540;
+  c += texture2D(backbuffer, vUv + vec2(0.0,-2.0)*t) * 0.1215;
+  c += texture2D(backbuffer, vUv + vec2(0.0,-1.0)*t) * 0.1945;
+  c += texture2D(backbuffer, vUv                   ) * 0.2270;
+  c += texture2D(backbuffer, vUv + vec2(0.0, 1.0)*t) * 0.1945;
+  c += texture2D(backbuffer, vUv + vec2(0.0, 2.0)*t) * 0.1215;
+  c += texture2D(backbuffer, vUv + vec2(0.0, 3.0)*t) * 0.0540;
+  c += texture2D(backbuffer, vUv + vec2(0.0, 4.0)*t) * 0.0162;
+  gl_FragColor = c;
+}`;
+
+// 最終合成 (Shader 46) — CA + ビネット + グリッチ + レンズフレア + フィルムグレイン
+const FRAG_FINAL = `
+varying vec2 vUv;
+uniform sampler2D sceneTex;
+uniform sampler2D noiseTex;
+uniform sampler2D lensFlareTex;
+uniform sampler2D blurTex;
+uniform float time;
+uniform float windowAspect;
+uniform float monsterVisibility;
+uniform float brightness;
+uniform vec2 cursorPos;
+#define PI 3.14159265359
+float random(vec2 p){ return fract(sin(dot(p.xy,vec2(12.9898,78.233)))*43758.5453); }
+void main() {
+  vec2 uv = vUv;
+  float n = 0.0;
+  if( monsterVisibility != 0.0 && monsterVisibility != 1.0 ) {
+    n = texture2D( noiseTex, vec2( time * 0.6, vUv.y * 0.2 ) ).x - 0.5;
+    n = sign( n ) * step( abs( n ), 0.2 );
+    n *= floor(sin( monsterVisibility * PI ) * 3.0) / 3.0;
+    uv = vUv + vec2( n * 0.01, 0.0 );
+  }
+  vec2 ruv = uv + normalize( uv - 0.5 ) * length( uv - 0.5 ) * (sin( monsterVisibility * PI ) * 0.02 + 0.006) * vec2( 1.0, 0.0 );
+  vec4 col;
+  col.x  = texture2D(sceneTex, ruv).x;
+  col.yz = texture2D(sceneTex, uv).yz;
+  col.w  = 1.0;
+  col.xyz *= 1.1;
+  col.xyz *= 1.0 - smoothstep( 0.2, 0.93, length(vUv - 0.5) ) * vec3( 0.75, 0.7, 0.6 );
+  col += texture2D(blurTex, vUv) * brightness;
+  vec2 flareUV = vUv;
+  flareUV -= 0.5;
+  flareUV.x *= windowAspect * 0.6;
+  flareUV += 0.5;
+  flareUV += cursorPos * 0.005;
+  vec3 lensFlare = texture2D( lensFlareTex, flareUV ).xyz;
+  col.xyz += lensFlare * length(texture2D(blurTex, vUv).xyz) * 3.0;
+  col += random( vUv + sin( time ) ) * 0.07;
+  gl_FragColor = col;
+}`;
+
+// =====================================
+// アセット URL
+// =====================================
+const ASSETS = {
+  background:     BASE + 'kv-background.jpg',
+  buildings:      BASE + 'kv-buildings.png',
+  ground:         BASE + 'kv-ground.png',
+  monster:        BASE + 'kv-monster.png',
+  monsterEmit:    BASE + 'kv-monster-emitter.png',
+  pipes0:         BASE + 'kv-pipes-0.png',
+  pipes1:         BASE + 'kv-pipes-1.png',
+  main:           BASE + 'kv-main.png',
+  frontObj:       BASE + 'kv-front_obj.png',
+  effect0:        BASE + 'kv-effect-0.png',
+  effect1:        BASE + 'kv-effect-1.png',
+  effect2:        BASE + 'kv-effect-2.png',
+  effect3:        BASE + 'kv-effect-3.png',
+  effect4:        BASE + 'kv-effect-4.png',
+  contentLogo:    BASE + 'content-2-logo.png',
+  contentInfo:    BASE + 'content-3-information.png',
+  contentInfoTxt: BASE + 'content-3-information-text.png',
+  contentTB:      BASE + 'content-3-tokoshie_bullet.png',
+  contentMorion:  BASE + 'content-4-morion_airline.png',
+  contentMorionL: BASE + 'content-4-morion_airline_line.png',
+  contentStaff:   BASE + 'content-4-staff.png',
+  pvContainer:    BASE + 'content-1-pv_container.png',
+  noise:          BASE + 'noise.jpg',
+  dust:           BASE + 'dust.png',
+  lens:           BASE + 'lens.jpg',
+  characters:     'assets/characters.png',
+  dots:           'assets/dots.png',
+};
+
+// =====================================
+// レイヤー設定（実サイトの3D座標）
+// =====================================
+const LAYERS = [
+  { key:'background', x:3.6,   y:4.31, z:-27.03, s:1.29, shader:'bg' },
+  { key:'buildings',  x:0.17,  y:0.36, z:-21.2,  s:0.9,  shader:'kv', emit:false },
+  { key:'ground',     x:-0.31, y:0.89, z:-17.28, s:1.17, shader:'kv', emit:false },
+  { key:'monster',    x:0.82,  y:1.58, z:-13.2,  s:1.05, shader:'kv', emit:true,  emitKey:'monsterEmit' },
+  { key:'effect3',    x:0.5,   y:1.26, z:-8.74,  s:7.13, shader:'eff' },
+  { key:'effect2',    x:-0.28, y:0.6,  z:-6.3,   s:0.3,  shader:'eff' },
+  { key:'pipes1',     x:0.01,  y:0.46, z:-2.76,  s:1.06, shader:'kv', emit:false },
+  { key:'pipes0',     x:-0.31, y:0.15, z:-1.43,  s:1.19, shader:'kv', emit:false },
+  { key:'effect1',    x:-0.09, y:0.74, z:-4.18,  s:0.61, shader:'eff' },
+];
+
+// 固定コンテンツ（スクロールしない）
+const FIXED_CONTENTS = [
+  { key:'main',          x:0.0,  y:0.0,  z:-2.2, s:1.1, shader:'display', name:'Main',   vis:'main' },
+  { key:'frontObj',      x:0.0,  y:-0.1, z:-1.8, s:0.9, shader:'display', name:'FrontObj',vis:'main'},
+  { key:'contentLogo',   x:0.0,  y:0.0,  z:-2.2, s:0.9, shader:'logo',    name:'Logo' },
+  { key:'contentMorion', x:0.0,  y:0.1,  z:-2.2, s:0.9, shader:'morion',  name:'Morion' },
+];
+
+// スクロールコンテンツ（scrollGroupと共に移動）
+// scrollY = scrollGroup.y が各セクションで何になるかの負値
+// Section1 peak: scrollGroup.y=2.885 → PV at y=-2.885
+// Section3 peak: scrollGroup.y=8.655 → Info at y=-8.655
+// Section4 peak: scrollGroup.y=11.54 → Staff at y=-11.54
+const SCROLL_CONTENTS = [
+  { key:'pvContainer',    x:0.0,  y:-2.885, z:-2.0, s:0.7, shader:'display', name:'PV',       vis:'pv' },
+  { key:'contentInfo',    x:0.0,  y:-8.655, z:-2.0, s:0.9, shader:'display', name:'Info',     vis:'info' },
+  { key:'contentInfoTxt', x:0.0,  y:-8.655, z:-1.8, s:0.9, shader:'display', name:'InfoTxt',  vis:'info' },
+  { key:'contentTB',      x:0.0,  y:-8.655, z:-2.3, s:1.3, shader:'infoback',name:'InfoBack', vis:'info' },
+  { key:'contentStaff',   x:0.0,  y:-11.54, z:-2.0, s:0.9, shader:'display', name:'Staff',    vis:'staff' },
+];
+
+// 後方互換: CONTENTS は両方を結合したもの（uniform更新に使う）
+const CONTENTS = [...FIXED_CONTENTS, ...SCROLL_CONTENTS];
+
+// =====================================
+// THREE.JS セットアップ
+// =====================================
+const canvas = document.getElementById('main-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x0a0a0a, 1);
+
+const scene    = new THREE.Scene();
+const backScene = new THREE.Scene();
+const camera   = new THREE.PerspectiveCamera(25.6, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 0, 0);
+
+// =====================================
+// レンダーターゲット & ポストプロセス
+// =====================================
+const W = window.innerWidth, H = window.innerHeight;
+const rtOpts = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+let sceneRT    = new THREE.WebGLRenderTarget(W, H, rtOpts);
+let compositeRT = new THREE.WebGLRenderTarget(W, H, rtOpts);
+let bloomThRT  = new THREE.WebGLRenderTarget(W>>1, H>>1, rtOpts);
+let bloomH_RT  = new THREE.WebGLRenderTarget(W>>1, H>>1, rtOpts);
+let bloomV_RT  = new THREE.WebGLRenderTarget(W>>1, H>>1, rtOpts);
+
+const postScene = new THREE.Scene();
+const postCam   = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const postGeo   = new THREE.PlaneGeometry(2, 2);
+
+// 各パスのマテリアルを先に作成（テクスチャはロード後に設定）
+const compositeMat = new THREE.ShaderMaterial({
+  uniforms: {
+    sceneTex:      { value: null },
+    backPVTex:     { value: null },
+    backPVTexBlue: { value: null },
+    noiseTex:      { value: null },
+    time:          { value: 0 },
+    windowAspect:  { value: W/H },
+    backPVAspect:  { value: 16/9 },
+    sceneSelector: { value: 0 },
+    isPC:          { value: 1.0 },
+    isBlue:        { value: 1.0 },
+    cursorPos:     { value: new THREE.Vector2(0, 0) },
+  },
+  vertexShader: VERT_POST, fragmentShader: FRAG_COMPOSITE, depthTest: false,
+});
+const bloomThMat = new THREE.ShaderMaterial({
+  uniforms: { backbuffer: { value: null }, threshold: { value: 0.88 } },
+  vertexShader: VERT_POST, fragmentShader: FRAG_BLOOM_THRESH, depthTest: false,
+});
+const bloomHMat = new THREE.ShaderMaterial({
+  uniforms: { backbuffer: { value: null }, resolution: { value: new THREE.Vector2(W>>1, H>>1) } },
+  vertexShader: VERT_POST, fragmentShader: FRAG_BLUR_H, depthTest: false,
+});
+const bloomVMat = new THREE.ShaderMaterial({
+  uniforms: { backbuffer: { value: null }, resolution: { value: new THREE.Vector2(W>>1, H>>1) } },
+  vertexShader: VERT_POST, fragmentShader: FRAG_BLUR_V, depthTest: false,
+});
+const finalMat = new THREE.ShaderMaterial({
+  uniforms: {
+    sceneTex:     { value: null },
+    noiseTex:     { value: null },
+    lensFlareTex: { value: null },
+    blurTex:      { value: null },
+    time:         { value: 0 },
+    windowAspect: { value: W/H },
+    monsterVisibility: { value: 1 },
+    brightness:   { value: 0.35 },
+    cursorPos:    { value: new THREE.Vector2(0, 0) },
+  },
+  vertexShader: VERT_POST, fragmentShader: FRAG_FINAL, depthTest: false,
+});
+
+const postMesh = new THREE.Mesh(postGeo, compositeMat);
+postScene.add(postMesh);
+
+function renderPass(mat, target) {
+  postMesh.material = mat;
+  renderer.setRenderTarget(target);
+  renderer.clear();
+  renderer.render(postScene, postCam);
+}
+
+// =====================================
+// テクスチャローダー
+// =====================================
+const loader = new THREE.TextureLoader();
+const textures = {};
+let loadedCount = 0;
+const totalAssets = Object.keys(ASSETS).length;
+
+function loadAllTextures() {
+  return new Promise(resolve => {
+    if (totalAssets === 0) { resolve(); return; }
+    let resolved = false;
+    const done = () => { if (!resolved) { resolved = true; resolve(); } };
+
+    Object.entries(ASSETS).forEach(([key, url]) => {
+      loader.load(url,
+        tex => {
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.minFilter = tex.magFilter = THREE.LinearFilter;
+          textures[key] = tex;
+          loadedCount++;
+          const el = document.getElementById('load-pct');
+          if (el) el.textContent = Math.floor(loadedCount / totalAssets * 100) + '%';
+          if (loadedCount >= totalAssets) done();
+        },
+        undefined,
+        () => { loadedCount++; if (loadedCount >= totalAssets) done(); }
+      );
+    });
+    setTimeout(done, 5000);
+  });
+}
+
+// =====================================
+// 3Dシーン構築
+// =====================================
+const meshes = [];
+const contentMeshes = [];
+const teaserMeshes = [];
+const scrollGroup = new THREE.Group();
+let fixedGroup;
+
+function makeRT(w, h) {
+  return new THREE.WebGLRenderTarget(w, h, rtOpts);
+}
+
+function buildScene() {
+  // Black 1x1 texture used as dummy emitterTex for non-emitter layers
+  const blackTex = new THREE.DataTexture(new Uint8Array([0,0,0,255]), 1, 1);
+  blackTex.needsUpdate = true;
+
+  // BackScene
+  LAYERS.forEach((layer, i) => {
+    const tex = textures[layer.key];
+    if (!tex) return;
+    let mat;
+    if (layer.shader === 'bg') {
+      mat = new THREE.ShaderMaterial({
+        uniforms: { tex: { value: tex }, monsterVisibility: { value: 1.0 }, sceneSelector: { value: 0.0 } },
+        vertexShader: VERT_SIMPLE, fragmentShader: FRAG_BG,
+        transparent: true, depthTest: false,
+      });
+    } else if (layer.shader === 'kv') {
+      mat = new THREE.ShaderMaterial({
+        uniforms: {
+          tex:               { value: tex },
+          emitterTex:        { value: layer.emit ? textures[layer.emitKey] : blackTex },
+          noiseTex:          { value: textures.noise },
+          time:              { value: 0 },
+          monsterVisibility: { value: 1.0 },
+          emitter:           { value: 0.0 },
+        },
+        vertexShader: VERT_SIMPLE, fragmentShader: FRAG_KV_NOISE,
+        transparent: true, depthTest: false, blending: THREE.NormalBlending,
+      });
+    } else if (layer.shader === 'eff') {
+      mat = new THREE.ShaderMaterial({
+        uniforms: { tex: { value: tex }, time: { value: 0 } },
+        vertexShader: VERT_SIMPLE, fragmentShader: FRAG_KV_EFFECT,
+        transparent: true, depthTest: false, blending: THREE.AdditiveBlending,
+      });
+    }
+    if (!mat) return;
+    const img = tex.image;
+    const imgAspect = img ? img.width / img.height : 1;
+    // Screen-filling size: depth × 2×tan(FOV/2) × scale
+    const FOV_TAN = Math.tan(12.8 * Math.PI / 180);
+    const asp = window.innerWidth / window.innerHeight;
+    const screenH = Math.abs(layer.z) * 2 * FOV_TAN;
+    const screenW = screenH * asp;
+    const w = screenW * layer.s;
+    const h = w / imgAspect;
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+    mesh.position.set(layer.x, layer.y, layer.z);
+    mesh.renderOrder = 100 - i;
+    backScene.add(mesh);
+    meshes.push({ mesh, mat, layer });
+  });
+
+  const FOV_TAN2 = Math.tan(12.8 * Math.PI / 180);
+  const asp2 = window.innerWidth / window.innerHeight;
+
+  function makeMat(c, tex) {
+    if (c.shader === 'logo') {
+      return new THREE.ShaderMaterial({
+        uniforms: {
+          tex:           { value: tex },
+          noise:         { value: textures.noise },
+          time:          { value: 0 },
+          logoTime:      { value: 0 },
+          scrollVelocity:{ value: 0 },
+          sceneSelector: { value: 0 },
+          logoVisibility:{ value: 0 },
+          isSP:          { value: 0.0 },
+        },
+        vertexShader: VERT_LOGO, fragmentShader: FRAG_LOGO,
+        transparent: true, depthTest: false,
+      });
+    } else if (c.shader === 'morion') {
+      return new THREE.ShaderMaterial({
+        uniforms: {
+          tex:              { value: tex },
+          lineTex:          { value: textures.contentMorionL },
+          noiseTex:         { value: textures.noise },
+          time:             { value: 0 },
+          morionVisibility: { value: 0 },
+        },
+        vertexShader: VERT_SIMPLE, fragmentShader: FRAG_MORION,
+        transparent: true, depthTest: false,
+      });
+    } else if (c.shader === 'infoback') {
+      return new THREE.ShaderMaterial({
+        uniforms: {
+          tex:                    { value: tex },
+          infoBackTextVisibility: { value: 0 },
+        },
+        vertexShader: VERT_SIMPLE, fragmentShader: FRAG_INFO_BACK_TEXT,
+        transparent: true, depthTest: false,
+      });
+    } else {
+      return new THREE.ShaderMaterial({
+        uniforms: { tex: { value: tex }, displayVisibility: { value: (c.vis === 'main') ? 1.0 : 0.0 } },
+        vertexShader: VERT_SIMPLE, fragmentShader: FRAG_DISPLAY,
+        transparent: true, depthTest: false,
+      });
+    }
+  }
+
+  function makeContentMesh(c, baseY, idx) {
+    const tex = textures[c.key];
+    if (!tex) return;
+    const mat = makeMat(c, tex);
+    const img = tex.image;
+    const imgAspect = img ? img.width / img.height : 1;
+    const depth = Math.abs(c.z) || 2.0;
+    const screenH = depth * 2 * FOV_TAN2;
+    const screenW = screenH * asp2;
+    const w = screenW * c.s;
+    const h = w / imgAspect;
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+    mesh.position.set(c.x, baseY + c.y, c.z);
+    mesh.renderOrder = 200 + idx;
+    contentMeshes.push({ mesh, mat, content: c });
+    return mesh;
+  }
+
+  // 固定コンテンツ（fixedGroup: スクロールしない）
+  fixedGroup = new THREE.Group();
+  FIXED_CONTENTS.forEach((c, i) => {
+    const m = makeContentMesh(c, 0, i);
+    if (m) fixedGroup.add(m);
+  });
+  scene.add(fixedGroup);
+
+  // スクロールコンテンツ（scrollGroup: Y軸移動）
+  SCROLL_CONTENTS.forEach((c, i) => {
+    const m = makeContentMesh(c, 0, FIXED_CONTENTS.length + i);
+    if (m) scrollGroup.add(m);
+  });
+  scene.add(scrollGroup);
+}
+
+// =====================================
+// ダストパーティクル（Shader 40/41）
+// =====================================
+const DUST_COUNT = 300;
+let dustMesh = null;
+
+function buildDust() {
+  const dustTex = textures.dust;
+  if (!dustTex) return;
+
+  // 各パーティクルは小さなPlane (4頂点2三角)
+  const pGeo = new THREE.PlaneGeometry(0.045, 0.045);
+  const pVerts = pGeo.attributes.position.array;
+  const pUVs   = pGeo.attributes.uv.array;
+  const pIdx   = pGeo.index.array;
+  const vPerP  = 4; // vertices per particle
+  const iPerP  = 6; // indices per particle
+
+  const positions  = new Float32Array(DUST_COUNT * vPerP * 3);
+  const uvs        = new Float32Array(DUST_COUNT * vPerP * 2);
+  const indices    = [];
+  const offsetPos  = new Float32Array(DUST_COUNT * vPerP * 3);
+  const nums       = new Float32Array(DUST_COUNT * vPerP);
+  const texOffsets = new Float32Array(DUST_COUNT * vPerP * 2);
+
+  for (let p = 0; p < DUST_COUNT; p++) {
+    for (let v = 0; v < vPerP; v++) {
+      const vi = (p * vPerP + v) * 3;
+      positions[vi]   = pVerts[v*3];
+      positions[vi+1] = pVerts[v*3+1];
+      positions[vi+2] = pVerts[v*3+2];
+      const ui = (p * vPerP + v) * 2;
+      uvs[ui]   = pUVs[v*2];
+      uvs[ui+1] = pUVs[v*2+1];
+    }
+    for (let id = 0; id < iPerP; id++) {
+      indices.push(pIdx[id] + p * vPerP);
+    }
+    const ox = (Math.random() - 0.5);
+    const oy = (Math.random() - 0.5);
+    const oz = -Math.random() * 0.3;
+    const num = Math.random() * Math.PI * 2;
+    const txU = (Math.floor(Math.random()*2)) * 0.5;
+    const txV = (Math.floor(Math.random()*2)) * 0.5;
+    for (let v = 0; v < vPerP; v++) {
+      const vi = (p * vPerP + v) * 3;
+      offsetPos[vi] = ox; offsetPos[vi+1] = oy; offsetPos[vi+2] = oz;
+      nums[p * vPerP + v] = num;
+      const ui = (p * vPerP + v) * 2;
+      texOffsets[ui] = txU; texOffsets[ui+1] = txV;
+    }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position',  new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute('uv',        new THREE.BufferAttribute(uvs, 2));
+  geo.setAttribute('offsetPos', new THREE.BufferAttribute(offsetPos, 3));
+  geo.setAttribute('num',       new THREE.BufferAttribute(nums, 1));
+  geo.setAttribute('texOffset', new THREE.BufferAttribute(texOffsets, 2));
+  geo.setIndex(indices);
+
+  const mat = new THREE.ShaderMaterial({
+    uniforms: {
+      tex:               { value: dustTex },
+      time:              { value: 0 },
+      monsterVisibility: { value: 1.0 },
+    },
+    vertexShader: VERT_DUST, fragmentShader: FRAG_DUST,
+    transparent: true, depthTest: false, blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+  });
+
+  dustMesh = new THREE.Mesh(geo, mat);
+  dustMesh.position.set(0, 0, -4);
+  dustMesh.renderOrder = 155;
+  backScene.add(dustMesh);
+}
+
+// =====================================
+// TEASERオーバーレイ構築
+// =====================================
+function buildTeaser() {
+  const charTex = textures.characters;
+  const dotTex  = textures.dots;
+  if (!charTex && !dotTex) return;
+
+  // unit square vertices/uvs/indices for one particle quad
+  const pGeo = new THREE.PlaneGeometry(1, 1);
+  const pVerts = pGeo.attributes.position.array;
+  const pUVs   = pGeo.attributes.uv.array;
+  const pIdx   = pGeo.index.array;
+  const vPerP = 4, iPerP = 6;
+
+  function buildMesh(tex, count, baseScale, zSpread, uvOptions, fragShader) {
+    if (!tex) return null;
+    const positions    = new Float32Array(count * vPerP * 3);
+    const uvs          = new Float32Array(count * vPerP * 2);
+    const offsetPos    = new Float32Array(count * vPerP * 3);
+    const randomOffset = new Float32Array(count * vPerP * 3);
+    const offsetUV     = new Float32Array(count * vPerP * 2);
+    const fadeNum      = new Float32Array(count * vPerP);
+    const visibility   = new Float32Array(count * vPerP);
+    const indices      = [];
+
+    for (let p = 0; p < count; p++) {
+      const s = baseScale * (0.65 + Math.random() * 0.7);
+      for (let v = 0; v < vPerP; v++) {
+        const vi = (p * vPerP + v) * 3;
+        positions[vi]   = pVerts[v * 3]     * s;
+        positions[vi+1] = pVerts[v * 3 + 1] * s;
+        positions[vi+2] = 0;
+        const ui = (p * vPerP + v) * 2;
+        uvs[ui]   = pUVs[v * 2];
+        uvs[ui+1] = pUVs[v * 2 + 1];
+      }
+      for (let id = 0; id < iPerP; id++) indices.push(pIdx[id] + p * vPerP);
+
+      const ox  = (Math.random() - 0.5) * 2.6;
+      const oy  = (Math.random() - 0.5) * 1.5;
+      const oz  = -Math.random() * zSpread;
+      const ro  = [(Math.random()-0.5)*0.08,(Math.random()-0.5)*0.08,0];
+      const fn  = Math.random() * Math.PI * 2;
+      const uvo = uvOptions[Math.floor(Math.random() * uvOptions.length)];
+
+      for (let v = 0; v < vPerP; v++) {
+        const vi = (p * vPerP + v) * 3;
+        offsetPos[vi]   = ox; offsetPos[vi+1]   = oy; offsetPos[vi+2]   = oz;
+        randomOffset[vi]= ro[0]; randomOffset[vi+1]= ro[1]; randomOffset[vi+2]= 0;
+        const ui = (p * vPerP + v) * 2;
+        offsetUV[ui] = uvo[0]; offsetUV[ui+1] = uvo[1];
+        fadeNum[p * vPerP + v]    = fn;
+        visibility[p * vPerP + v] = 1.0;
+      }
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position',     new THREE.BufferAttribute(positions,    3));
+    geo.setAttribute('uv',           new THREE.BufferAttribute(uvs,          2));
+    geo.setAttribute('offsetPos',    new THREE.BufferAttribute(offsetPos,    3));
+    geo.setAttribute('randomOffset', new THREE.BufferAttribute(randomOffset, 3));
+    geo.setAttribute('offsetUV',     new THREE.BufferAttribute(offsetUV,     2));
+    geo.setAttribute('fadeNum',      new THREE.BufferAttribute(fadeNum,      1));
+    geo.setAttribute('visibility',   new THREE.BufferAttribute(visibility,   1));
+    geo.setIndex(indices);
+
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        tex:               { value: tex },
+        noiseTex:          { value: textures.noise },
+        overlayVisibility: { value: 0.0 },
+        opacity:           { value: 1.0 },
+      },
+      vertexShader:   VERT_TEASER,
+      fragmentShader: fragShader,
+      transparent: true, depthTest: false,
+      blending: THREE.NormalBlending,
+      side: THREE.DoubleSide,
+    });
+
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(0, 0, -4.0);
+    mesh.renderOrder = 162;
+    return mesh;
+  }
+
+  const uvOpts = [[0,0],[1,0],[0,1],[1,1]];
+
+  // characters.png: indexed PNG — use luminance-based discard to remove white background
+  const charMesh = buildMesh(charTex, 40, 0.22, 0.8, uvOpts, FRAG_TEASER_CHAR);
+  if (charMesh) { backScene.add(charMesh); teaserMeshes.push(charMesh); }
+
+  // dots.png: RGBA PNG with transparent background — standard alpha blend
+  const dotMesh  = buildMesh(dotTex,  90, 0.14, 1.2, uvOpts, FRAG_TEASER);
+  if (dotMesh)  { backScene.add(dotMesh);  teaserMeshes.push(dotMesh); }
+
+  pGeo.dispose();
+}
+
+// =====================================
+// アニメーター
+// =====================================
+class AnimVar {
+  constructor(val=0, dur=0.6) { this.value = val; this.target = val; this.dur = dur; }
+  set(v, d) { this.target = v; if (d !== undefined) this.dur = d; }
+  update(dt) {
+    const diff = this.target - this.value;
+    this.value += diff * Math.min(1, dt / Math.max(this.dur, 0.001));
+  }
+}
+
+const vars = {
+  scrollPos:        new AnimVar(0,   0.3),
+  sceneSelector:    new AnimVar(0,   0.8),
+  monsterVisibility:new AnimVar(1.0, 0.8),
+  overlayVisibility:new AnimVar(0,   0.6),
+  logoVisibility:   new AnimVar(0,   1.2),
+  morionVisibility: new AnimVar(0,   0.8),
+  infoVisibility:   new AnimVar(0,   0.8),
+  infoBackTextVis:  new AnimVar(0,   1.0),
+  staffVisibility:  new AnimVar(0,   0.8),
+  scrollVelocity:   new AnimVar(0,   0.1),
+  logoTime:         new AnimVar(0,   1.2),
+  cursorPos: { x: new AnimVar(0.5, 0.15), y: new AnimVar(0.5, 0.15) },
+};
+
+// =====================================
+// スクロール管理
+// =====================================
+let scrollTarget = 0;
+let scrollPos    = 0;
+let scrollVel    = 0;
+const DAMP = 0.88;
+
+function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+function scrollDelta(d) { scrollTarget = clamp01(scrollTarget + d); }
+function scrollJump(v)  { scrollTarget = clamp01(v); }
+
+function updateScroll(dt) {
+  const diff = scrollTarget - scrollPos;
+  const oldPos = scrollPos;
+  scrollVel = scrollVel * DAMP + diff * (1 - DAMP);
+  scrollPos = clamp01(scrollPos + scrollVel);
+  scrollGroup.position.y = scrollPos * 11.54;
+  const vel = Math.abs(scrollPos - oldPos) * 60;
+  vars.scrollVelocity.set(vel, 0.05);
+}
+
+// =====================================
+// セクション管理
+// =====================================
+let curSec = 0;
+const panels = document.querySelectorAll('.sec');
+const dots   = document.querySelectorAll('.dot');
+const mnum   = document.getElementById('mnum');
+const mprog  = document.getElementById('mprog');
+const CIRC   = 220;
+
+function updateSections() {
+  const raw = scrollPos * 4;
+  const sec = Math.min(4, Math.max(0, Math.round(raw)));
+
+  panels.forEach((p, i) => {
+    if (p.id === 's2') return;
+    const dist = Math.abs(raw - i);
+    const op = Math.max(0, 1 - dist * 1.75);
+    const ty = (raw - i) * 55;
+    p.style.opacity  = op;
+    p.style.transform = `translateY(${ty}px)`;
+    if (op > 0.05) p.classList.add('vis');
+    else           p.classList.remove('vis');
+  });
+
+  vars.sceneSelector.set(Math.min(1, raw * 0.5));
+  vars.monsterVisibility.set(Math.max(0, 1 - raw * 0.7));
+  // overlayVisibility: 0→1 during raw 0→0.35, 1→2 during raw 0.35→0.85 (then hidden)
+  vars.overlayVisibility.set(Math.min(2, raw * 4.0 * 0.6));
+  vars.logoVisibility.set(raw >= 1.5 && raw <= 2.5 ? Math.max(0, 1 - Math.abs(raw - 2) * 2) : 0);
+  vars.logoTime.set(raw >= 1.5 && raw <= 2.5 ? 1.0 : 0);
+  vars.infoVisibility.set(raw >= 2.5 && raw <= 3.5 ? Math.max(0, 1 - Math.abs(raw - 3) * 2) : 0);
+  vars.infoBackTextVis.set(raw >= 2.5 && raw <= 3.5 ? Math.min(1, (raw - 2.5) * 2) : raw > 3.5 ? 1 : 0);
+  vars.morionVisibility.set(raw >= 3.5 ? Math.min(2, (raw - 3.5) * 4) : 0);
+  vars.staffVisibility.set(raw >= 3.5 ? Math.min(1, (raw - 3.5) * 2) : 0);
+
+  if (sec === curSec) return;
+  curSec = sec;
+  document.body.setAttribute('data-sec', sec);
+  dots.forEach((d, i) => d.classList.toggle('on', i === sec));
+  if (mnum)  mnum.textContent = sec;
+  if (mprog) mprog.style.strokeDashoffset = CIRC - CIRC * (sec / 4);
+  const sb = document.getElementById('sb');
+  const tb = document.getElementById('tb');
+  if (sec < 4) { sb.className = 'show'; tb.className = 'hide'; }
+  else          { sb.className = 'hide'; tb.className = 'show'; }
+}
+
+// =====================================
+// カーソル
+// =====================================
+const cursorEl = document.getElementById('cursor');
+let mx=window.innerWidth/2, my=window.innerHeight/2, cx=mx, cy=my, curActive=false;
+
+document.addEventListener('mousemove', e => {
+  if (!curActive) { curActive = true; document.body.classList.add('js-cursor'); }
+  mx = e.clientX; my = e.clientY;
+  vars.cursorPos.x.set(mx / window.innerWidth);
+  vars.cursorPos.y.set(my / window.innerHeight);
+}, { passive: true });
+
+function bindCursorHover() {
+  document.querySelectorAll('a,button,.pv-wrap').forEach(el => {
+    el.addEventListener('mouseenter', () => cursorEl.classList.add('big'));
+    el.addEventListener('mouseleave', () => cursorEl.classList.remove('big'));
+  });
+}
+
+function updateCursor() {
+  if (!curActive) return;
+  cx += (mx - cx) * 0.18;
+  cy += (my - cy) * 0.18;
+  cursorEl.style.left = cx + 'px';
+  cursorEl.style.top  = cy + 'px';
+}
+
+// =====================================
+// Uniform更新
+// =====================================
+function updateUniforms(time, dt) {
+  Object.values(vars).forEach(v => {
+    if (v instanceof AnimVar) v.update(dt);
+    else if (v.x) { v.x.update(dt); v.y.update(dt); }
+  });
+
+  // カーソルをnorm座標に変換
+  const ncx = vars.cursorPos.x.value - 0.5;
+  const ncy = vars.cursorPos.y.value - 0.5;
+
+  // 背景レイヤー uniform + カーソルパララックス
+  meshes.forEach(({ mesh, mat, layer }) => {
+    const u = mat.uniforms;
+    if (u.time)              u.time.value              = time;
+    if (u.sceneSelector)     u.sceneSelector.value     = vars.sceneSelector.value;
+    if (u.monsterVisibility) {
+      const mv = layer.key === 'monster' ? vars.monsterVisibility.value
+               : vars.monsterVisibility.value * 1.3;
+      u.monsterVisibility.value = Math.max(0, mv);
+    }
+    if (u.emitter && layer.emit) u.emitter.value = vars.monsterVisibility.value * 0.7;
+    // カーソルパララックス（深度比例）
+    const depth = Math.abs(layer.z) / 27;
+    const str   = (1 - depth) * 0.22;
+    mesh.position.x = layer.x + ncx * str;
+    mesh.position.y = layer.y - ncy * str * 0.55;
+  });
+
+  // 固定コンテンツのカーソルパララックス
+  if (fixedGroup) {
+    fixedGroup.position.x = ncx * 0.06;
+    fixedGroup.position.y = -ncy * 0.03;
+  }
+
+  // ダスト
+  if (dustMesh) {
+    dustMesh.material.uniforms.time.value              = time;
+    dustMesh.material.uniforms.monsterVisibility.value = vars.monsterVisibility.value;
+  }
+
+  // TEASERオーバーレイ
+  teaserMeshes.forEach(m => {
+    m.material.uniforms.overlayVisibility.value = vars.overlayVisibility.value;
+  });
+
+  // コンテンツ
+  contentMeshes.forEach(({ mat, content }) => {
+    const u = mat.uniforms;
+    if (u.time)          u.time.value          = time;
+    if (u.logoTime)      u.logoTime.value      = vars.logoTime.value;
+    if (u.scrollVelocity)u.scrollVelocity.value= vars.scrollVelocity.value;
+    if (u.sceneSelector) u.sceneSelector.value = vars.sceneSelector.value;
+    if (u.logoVisibility)u.logoVisibility.value= vars.logoVisibility.value;
+    if (u.morionVisibility) u.morionVisibility.value = vars.morionVisibility.value;
+    if (u.infoBackTextVisibility) u.infoBackTextVisibility.value = vars.infoBackTextVis.value;
+    if (u.displayVisibility) {
+      const vis = content.vis;
+      if      (vis === 'main')  u.displayVisibility.value = Math.max(0, 1 - scrollPos * 1.8);
+      else if (vis === 'pv')    u.displayVisibility.value = Math.max(0, 1 - Math.abs(scrollPos*4-1)*2);
+      else if (vis === 'info')  u.displayVisibility.value = vars.infoVisibility.value;
+      else if (vis === 'staff') u.displayVisibility.value = vars.staffVisibility.value;
+    }
+  });
+
+  // ポストプロセス uniform
+  const asp = window.innerWidth / window.innerHeight;
+  compositeMat.uniforms.time.value          = time;
+  compositeMat.uniforms.sceneSelector.value = vars.sceneSelector.value;
+  compositeMat.uniforms.windowAspect.value  = asp;
+  compositeMat.uniforms.cursorPos.value.set(ncx, ncy);
+
+  finalMat.uniforms.time.value              = time;
+  finalMat.uniforms.monsterVisibility.value = vars.monsterVisibility.value;
+  finalMat.uniforms.windowAspect.value      = asp;
+  finalMat.uniforms.cursorPos.value.set(ncx, ncy);
+}
+
+// =====================================
+// PV モーダル
+// =====================================
+const modal = document.getElementById('modal');
+const mvid  = document.getElementById('mvid');
+let mOpen = false;
+
+function pvShow() {
+  if (mOpen) return; mOpen = true;
+  modal.classList.add('open'); document.body.classList.add('pv-open');
+  setTimeout(() => {
+    mvid.innerHTML = '<iframe src="https://www.youtube.com/embed/TlGzO48SLdM?autoplay=1&rel=0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>';
+  }, 380);
+}
+function pvHide() {
+  if (!mOpen) return; mOpen = false;
+  modal.classList.remove('open'); document.body.classList.remove('pv-open');
+  setTimeout(() => { mvid.innerHTML = ''; }, 420);
+}
+modal.addEventListener('click', e => { if (e.target===modal) pvHide(); });
+document.getElementById('mclose').addEventListener('click', pvHide);
+document.addEventListener('keydown', e => { if (e.key==='Escape') pvHide(); });
+
+// =====================================
+// イベント
+// =====================================
+window.addEventListener('wheel', e => {
+  if (mOpen) return; e.preventDefault();
+  scrollDelta(e.deltaY * 0.00075);
+}, { passive: false });
+
+let ty0 = 0;
+window.addEventListener('touchstart', e => { ty0 = e.touches[0].clientY; }, { passive: true });
+window.addEventListener('touchmove', e => {
+  if (mOpen) return;
+  scrollDelta((ty0 - e.touches[0].clientY) * 0.0011);
+  ty0 = e.touches[0].clientY;
+}, { passive: true });
+
+window.addEventListener('keydown', e => {
+  if (mOpen) return;
+  if (e.key==='ArrowDown'||e.key==='PageDown') scrollDelta(0.25);
+  if (e.key==='ArrowUp'  ||e.key==='PageUp')   scrollDelta(-0.25);
+  if (e.key==='End')   scrollJump(1);
+  if (e.key==='Home')  scrollJump(0);
+});
+
+document.getElementById('sb').addEventListener('click', () => scrollDelta(0.25));
+document.getElementById('tb').addEventListener('click', () => scrollJump(0));
+document.getElementById('logo-home').addEventListener('click', e => { e.preventDefault(); scrollJump(0); });
+document.getElementById('pv-btn').addEventListener('click', pvShow);
+
+window.addEventListener('resize', () => {
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  // RT再生成
+  sceneRT.dispose();    sceneRT    = new THREE.WebGLRenderTarget(w, h, rtOpts);
+  compositeRT.dispose();compositeRT = new THREE.WebGLRenderTarget(w, h, rtOpts);
+  bloomThRT.dispose();  bloomThRT  = new THREE.WebGLRenderTarget(w>>1, h>>1, rtOpts);
+  bloomH_RT.dispose();  bloomH_RT  = new THREE.WebGLRenderTarget(w>>1, h>>1, rtOpts);
+  bloomV_RT.dispose();  bloomV_RT  = new THREE.WebGLRenderTarget(w>>1, h>>1, rtOpts);
+  bloomHMat.uniforms.resolution.value.set(w>>1, h>>1);
+  bloomVMat.uniforms.resolution.value.set(w>>1, h>>1);
+  compositeMat.uniforms.windowAspect.value = w/h;
+  finalMat.uniforms.windowAspect.value = w/h;
+});
+
+// =====================================
+// メインループ
+// =====================================
+let lastTs = 0;
+function loop(ts) {
+  const dt = Math.min((ts - lastTs) / 1000, 0.05);
+  lastTs = ts;
+  const time = ts / 1000;
+
+  updateScroll(dt);
+  updateSections();
+  updateCursor();
+  updateUniforms(time, dt);
+
+  // Pass 1: 3Dシーン → sceneRT
+  renderer.setRenderTarget(sceneRT);
+  renderer.autoClear = true;
+  renderer.render(backScene, camera);
+  renderer.autoClear = false;
+  renderer.render(scene, camera);
+
+  // Pass 2: KV合成 (Shader44) → compositeRT
+  compositeMat.uniforms.sceneTex.value = sceneRT.texture;
+  renderPass(compositeMat, compositeRT);
+
+  // Pass 3: ブルーム閾値 → bloomThRT
+  bloomThMat.uniforms.backbuffer.value = compositeRT.texture;
+  renderPass(bloomThMat, bloomThRT);
+
+  // Pass 4: 水平ブラー → bloomH_RT
+  bloomHMat.uniforms.backbuffer.value = bloomThRT.texture;
+  renderPass(bloomHMat, bloomH_RT);
+
+  // Pass 5: 垂直ブラー → bloomV_RT
+  bloomVMat.uniforms.backbuffer.value = bloomH_RT.texture;
+  renderPass(bloomVMat, bloomV_RT);
+
+  // Pass 6: 最終合成 (Shader46) → スクリーン
+  finalMat.uniforms.sceneTex.value  = compositeRT.texture;
+  finalMat.uniforms.blurTex.value   = bloomV_RT.texture;
+  renderPass(finalMat, null);
+
+  requestAnimationFrame(loop);
+}
+
+// =====================================
+// 起動
+// =====================================
+function hideLoading() {
+  const ld = document.getElementById('loading');
+  if (ld) { ld.classList.add('out'); setTimeout(() => ld.remove(), 800); }
+}
+
+async function init() {
+  try {
+    await loadAllTextures();
+  } catch(e) { console.warn('texture load error:', e); }
+
+  try {
+    buildScene();
+    buildDust();
+    buildTeaser();
+
+    // background-pv.mp4 をVideoTextureとして使用（実サイトと同様）
+    const videoEl = document.getElementById('bg-video');
+    let pvTex;
+    if (videoEl) {
+      pvTex = new THREE.VideoTexture(videoEl);
+      pvTex.minFilter = THREE.LinearFilter;
+      pvTex.magFilter = THREE.LinearFilter;
+      // video aspect: 動画ロード後にaspectを更新
+      videoEl.addEventListener('loadedmetadata', () => {
+        if (videoEl.videoWidth && videoEl.videoHeight) {
+          compositeMat.uniforms.backPVAspect.value = videoEl.videoWidth / videoEl.videoHeight;
+        }
+      });
+      videoEl.play().catch(() => {
+        // autoplay blocked → fallback to static bg
+        pvTex = textures.background || null;
+        compositeMat.uniforms.backPVTex.value = pvTex;
+      });
+    } else {
+      pvTex = textures.background || null;
+    }
+    compositeMat.uniforms.backPVTex.value     = pvTex;
+    compositeMat.uniforms.backPVTexBlue.value = textures.background || null;
+    compositeMat.uniforms.noiseTex.value      = textures.noise || null;
+    finalMat.uniforms.noiseTex.value          = textures.noise || null;
+    finalMat.uniforms.lensFlareTex.value      = textures.lens || null;
+
+    bindCursorHover();
+    setTimeout(() => { hideLoading(); requestAnimationFrame(loop); }, 400);
+  } catch(e) {
+    console.error('init error:', e);
+    hideLoading();
+  }
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>
