@@ -6,7 +6,7 @@
 <title>永久×バレット | TOKOSHIE×BULLET</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Noto+Serif+JP:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 ul,li{list-style:none}
@@ -382,6 +382,191 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
 #warn{display:none;position:fixed;inset:0;z-index:999;background:var(--bg);align-items:center;justify-content:center;text-align:center;padding:20px}
 @media(max-width:580px){#warn{display:flex}}
 #warn p{font-family:Quantico,sans-serif;font-size:15px;letter-spacing:2px;line-height:1.9;color:var(--white)}
+
+/* ========================
+   WORKS OVERLAY
+======================== */
+:root{
+  --wbg:rgb(13,13,13);
+  --wfg:rgb(230,230,230);
+  --wred:hsl(350,90%,30%);
+}
+#main-canvas{transition:opacity .5s}
+#main-canvas.works-dim{opacity:.18}
+
+#works-btn{
+  position:fixed;bottom:48px;right:24px;
+  z-index:50;background:none;cursor:none;
+  font-family:'Space Mono',monospace;
+  font-size:9px;letter-spacing:4px;
+  color:rgba(255,255,255,.7);
+  padding:9px 14px;
+  border:1px solid rgba(255,255,255,.22);
+  opacity:0;pointer-events:none;
+  transition:opacity .35s .15s,color .2s,border-color .2s;
+}
+#works-btn.show{opacity:1;pointer-events:all}
+#works-btn:hover{color:var(--pink);border-color:var(--pink)}
+
+#works-overlay{
+  position:fixed;inset:0;z-index:100;
+  background:var(--wbg);
+  display:flex;
+  opacity:0;pointer-events:none;
+  transition:opacity .55s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+#works-overlay.open{opacity:1;pointer-events:all}
+#works-overlay::after{
+  content:'';
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);
+  pointer-events:none;z-index:10;
+}
+
+.works-sidebar{
+  width:186px;flex-shrink:0;
+  border-right:1px solid rgba(230,230,230,.09);
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  padding:40px 26px;
+  position:relative;z-index:2;
+}
+.works-sidebar-label{
+  font-family:'Space Mono',monospace;
+  font-size:9px;letter-spacing:4px;
+  color:rgba(230,230,230,.28);
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  transform:rotate(180deg);
+  user-select:none;
+}
+.works-close{
+  background:none;border:none;cursor:none;
+  font-family:'Space Mono',monospace;
+  font-size:9px;letter-spacing:3px;
+  color:rgba(230,230,230,.38);
+  padding:22px 0 0;
+  position:relative;
+  transition:color .2s;
+  text-align:left;
+}
+.works-close::before,.works-close::after{
+  content:'';position:absolute;top:0;left:50%;
+  width:20px;height:1px;
+  background:rgba(230,230,230,.38);
+  transition:background .2s;
+}
+.works-close::before{transform:translate(-50%) rotate(-45deg)}
+.works-close::after {transform:translate(-50%) rotate(45deg)}
+.works-close:hover{color:var(--wred)}
+.works-close:hover::before,.works-close:hover::after{background:var(--wred)}
+
+.works-list{
+  width:430px;flex-shrink:0;
+  border-right:1px solid rgba(230,230,230,.07);
+  overflow-y:auto;scrollbar-width:none;
+  position:relative;z-index:2;
+}
+.works-list::-webkit-scrollbar{display:none}
+.works-list-inner{padding:44px 0 72px}
+
+.works-item{
+  padding:0 32px;
+  border-bottom:1px solid rgba(230,230,230,.055);
+  cursor:none;
+  transition:background .22s;
+}
+.works-item:hover{background:rgba(230,230,230,.018)}
+.works-item-row1{
+  display:flex;align-items:center;gap:14px;
+  padding:18px 0 10px;
+}
+.works-item-num{
+  font-family:'Space Mono',monospace;
+  font-size:9px;letter-spacing:1px;
+  color:rgba(230,230,230,.22);
+  flex-shrink:0;width:22px;
+  transition:color .22s;
+}
+.works-item-thumb{
+  width:140px;height:79px;
+  flex-shrink:0;overflow:hidden;
+  position:relative;
+}
+.works-item-thumb img{
+  width:100%;height:100%;object-fit:cover;
+  display:block;
+  filter:grayscale(1) brightness(.85);
+  transition:filter .4s,transform .4s;
+}
+.works-item-thumb::after{
+  content:'';
+  position:absolute;inset:0;
+  background:var(--wred);
+  mix-blend-mode:overlay;
+  opacity:0;
+  transition:opacity .4s;
+  pointer-events:none;
+}
+.works-item-row2{
+  padding:0 0 16px;
+  text-align:right;
+}
+.works-item-title{
+  font-family:'Noto Serif JP',serif;
+  font-size:10px;letter-spacing:1.5px;
+  color:rgba(230,230,230,.52);
+  line-height:1.85;
+  transition:color .22s;
+}
+.works-item:hover .works-item-num{color:var(--wred)}
+.works-item:hover .works-item-title{color:var(--wfg)}
+.works-item:hover .works-item-thumb img{filter:grayscale(0) brightness(1);transform:scale(1.06)}
+.works-item:hover .works-item-thumb::after{opacity:.42}
+
+.works-preview{
+  flex:1;min-width:0;
+  position:relative;overflow:hidden;
+  z-index:2;
+}
+.works-preview-img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  opacity:0;
+  transition:opacity .45s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+}
+.works-preview-img.active{opacity:1}
+.works-preview-veil{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(13,13,13,.88) 0%,rgba(13,13,13,.35) 55%,transparent 100%);
+  z-index:1;pointer-events:none;
+}
+.works-preview-label{
+  position:absolute;bottom:44px;left:44px;
+  z-index:3;
+}
+.works-preview-num{
+  font-family:'Space Mono',monospace;
+  font-size:9px;letter-spacing:4px;
+  color:rgba(230,230,230,.45);
+  margin-bottom:8px;
+}
+.works-preview-title{
+  font-family:'Noto Serif JP',serif;
+  font-size:19px;letter-spacing:3px;
+  color:var(--wfg);
+  line-height:1.65;
+  text-shadow:0 2px 18px rgba(0,0,0,.75);
+}
+.works-preview-sub{
+  font-family:'Space Mono',monospace;
+  font-size:8px;letter-spacing:3px;
+  color:rgba(230,230,230,.35);
+  margin-top:12px;
+}
 </style>
 </head>
 <body>
@@ -395,7 +580,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
 </div>
 
 <canvas id="main-canvas"></canvas>
-<video id="bg-video" src="tokoshie-assets/background-pv.mp4"
+<video id="bg-video" src="assets/background-pv.mp4"
        autoplay muted loop playsinline
        style="position:absolute;visibility:hidden;pointer-events:none;width:1px;height:1px;top:0;left:0">
 </video>
@@ -434,7 +619,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
   <section class="sec" id="s1">
     <div class="pv-wrap" id="pv-btn">
       <img class="pv-thumb" id="pv-thumb-img"
-           src="tokoshie-assets/content-1-pv_thumbnail.jpg"
+           src="assets/content-1-pv_thumbnail.jpg"
            alt="PV">
       <div class="pv-ov">
         <div class="play-btn">
@@ -494,7 +679,112 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
 <div id="modal"><div class="mbox"><div class="mvid" id="mvid"></div><div class="mcb"></div><button id="mclose">CLOSE</button></div></div>
 <div id="warn"><p>画面が小さいため<br>表示することができません。</p></div>
 
-<script src="tokoshie-assets/three.min.js"></script>
+<button id="works-btn">WORKS</button>
+
+<div id="works-overlay">
+  <div class="works-sidebar">
+    <span class="works-sidebar-label">WORKS</span>
+    <button class="works-close" id="works-close">CLOSE</button>
+  </div>
+
+  <div class="works-list" id="works-list">
+    <div class="works-list-inner">
+
+      <div class="works-item" data-idx="0">
+        <div class="works-item-row1">
+          <span class="works-item-num">#01</span>
+          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+        </div>
+        <div class="works-item-row2"><p class="works-item-title">A Horny Money World<br>~伝説の夜~</p></div>
+      </div>
+
+      <div class="works-item" data-idx="1">
+        <div class="works-item-row1">
+          <span class="works-item-num">#02</span>
+          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+        </div>
+        <div class="works-item-row2"><p class="works-item-title">宝鐘マリン &amp; こぼ・かなえる<br>III</p></div>
+      </div>
+
+      <div class="works-item" data-idx="2">
+        <div class="works-item-row1">
+          <span class="works-item-num">#03</span>
+          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+        </div>
+        <div class="works-item-row2"><p class="works-item-title">しぐれうい<br>うい麦畑でつかまえて</p></div>
+      </div>
+
+      <div class="works-item" data-idx="3">
+        <div class="works-item-row1">
+          <span class="works-item-num">#04</span>
+          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+        </div>
+        <div class="works-item-row2"><p class="works-item-title">星街すいせい<br>みちづれ</p></div>
+      </div>
+
+      <div class="works-item" data-idx="4">
+        <div class="works-item-row1">
+          <span class="works-item-num">#05</span>
+          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+        </div>
+        <div class="works-item-row2"><p class="works-item-title">Nornis<br>ジョハリ</p></div>
+      </div>
+
+      <div class="works-item" data-idx="5">
+        <div class="works-item-row1">
+          <span class="works-item-num">#06</span>
+          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/64402d20c70f9a68ce6ab628c6545201b97ff70c-2400x1361.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+        </div>
+        <div class="works-item-row2"><p class="works-item-title">REALiZE / LiSA<br>covered by ReGLOSS</p></div>
+      </div>
+
+      <div class="works-item" data-idx="6">
+        <div class="works-item-row1">
+          <span class="works-item-num">#07</span>
+          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+        </div>
+        <div class="works-item-row2"><p class="works-item-title">宝鐘マリン<br>真夜中のドア</p></div>
+      </div>
+
+      <div class="works-item" data-idx="7">
+        <div class="works-item-row1">
+          <span class="works-item-num">#08</span>
+          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+        </div>
+        <div class="works-item-row2"><p class="works-item-title">宝鐘マリン<br>め組の人 cover</p></div>
+      </div>
+
+      <div class="works-item" data-idx="8">
+        <div class="works-item-row1">
+          <span class="works-item-num">#09</span>
+          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+        </div>
+        <div class="works-item-row2"><p class="works-item-title">REIN<br>自主制作</p></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="works-preview" id="works-preview">
+    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=85&w=1400" alt="" loading="lazy">
+    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=85&w=1400" alt="" loading="lazy">
+    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=85&w=1400" alt="" loading="lazy">
+    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=85&w=1400" alt="" loading="lazy">
+    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=85&w=1400" alt="" loading="lazy">
+    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/64402d20c70f9a68ce6ab628c6545201b97ff70c-2400x1361.png?auto=format&q=85&w=1400" alt="" loading="lazy">
+    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=85&w=1400" alt="" loading="lazy">
+    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=85&w=1400" alt="" loading="lazy">
+    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=85&w=1400" alt="" loading="lazy">
+    <div class="works-preview-veil"></div>
+    <div class="works-preview-label">
+      <p class="works-preview-num" id="wp-num">PRODUCTION HASU</p>
+      <p class="works-preview-title" id="wp-title">SELECTED WORKS</p>
+      <p class="works-preview-sub" id="wp-sub">09 WORKS — MV DIRECTION / DESIGN</p>
+    </div>
+  </div>
+</div>
+
+<script src="assets/three.min.js"></script>
 <script>
 /* ============================================================
    TOKOSHIE×BULLET 完全再現 v3
@@ -1508,8 +1798,91 @@ let scrollPos    = 0;
 let scrollVel    = 0;
 const DAMP = 0.88;
 
+// =====================================
+// WORKS
+// =====================================
+let worksOpen = false;
+
+const WORKS_DATA = [
+  { num:'#01', title:'A Horny Money World\n~伝説の夜~',       sub:'MV DIRECTION / DESIGN' },
+  { num:'#02', title:'宝鐘マリン & こぼ・かなえる\nIII',     sub:'MV DIRECTION / DESIGN' },
+  { num:'#03', title:'しぐれうい\nうい麦畑でつかまえて',     sub:'MV DIRECTION / DESIGN' },
+  { num:'#04', title:'星街すいせい\nみちづれ',               sub:'MV DIRECTION / DESIGN' },
+  { num:'#05', title:'Nornis\nジョハリ',                     sub:'MV DIRECTION / DESIGN' },
+  { num:'#06', title:'REALiZE / LiSA\ncovered by ReGLOSS',   sub:'MV DIRECTION / DESIGN' },
+  { num:'#07', title:'宝鐘マリン\n真夜中のドア',             sub:'MV DIRECTION / DESIGN' },
+  { num:'#08', title:'宝鐘マリン\nめ組の人 cover',           sub:'MV DIRECTION / DESIGN' },
+  { num:'#09', title:'REIN\n自主制作',                       sub:'VIDEO DIRECTION' },
+];
+
+function openWorks() {
+  if (worksOpen) return;
+  worksOpen = true;
+  document.getElementById('works-overlay').classList.add('open');
+  canvas.classList.add('works-dim');
+  document.getElementById('meter').style.transition = 'opacity .4s';
+  document.getElementById('meter').style.opacity    = '0';
+  document.getElementById('dots').style.transition  = 'opacity .4s';
+  document.getElementById('dots').style.opacity     = '0';
+  document.getElementById('works-btn').classList.remove('show');
+}
+
+function closeWorks() {
+  if (!worksOpen) return;
+  worksOpen = false;
+  document.getElementById('works-overlay').classList.remove('open');
+  canvas.classList.remove('works-dim');
+  document.getElementById('meter').style.opacity = '1';
+  document.getElementById('dots').style.opacity  = '1';
+  // restore works-btn if still on sec 4
+  if (scrollTarget >= 0.998) document.getElementById('works-btn').classList.add('show');
+}
+
+function handleWorksScroll(dy) {
+  const list = document.getElementById('works-list');
+  if (dy < 0 && list.scrollTop <= 0) { closeWorks(); return; }
+  list.scrollTop += dy;
+}
+
+function initWorks() {
+  const items    = document.querySelectorAll('.works-item');
+  const previewImgs = document.querySelectorAll('.works-preview-img');
+  const wpNum   = document.getElementById('wp-num');
+  const wpTitle = document.getElementById('wp-title');
+  const wpSub   = document.getElementById('wp-sub');
+
+  items.forEach((item, i) => {
+    item.addEventListener('mouseenter', () => {
+      previewImgs.forEach((img, j) => img.classList.toggle('active', j === i));
+      const d = WORKS_DATA[i];
+      wpNum.textContent = d.num;
+      wpTitle.innerHTML = d.title.replace('\n', '<br>');
+      wpSub.textContent = d.sub;
+      cursorEl.classList.add('big');
+    });
+    item.addEventListener('mouseleave', () => {
+      previewImgs.forEach(img => img.classList.remove('active'));
+      wpNum.textContent   = 'PRODUCTION HASU';
+      wpTitle.innerHTML   = 'SELECTED WORKS';
+      wpSub.textContent   = '09 WORKS — MV DIRECTION / DESIGN';
+      cursorEl.classList.remove('big');
+    });
+  });
+
+  const wClose = document.getElementById('works-close');
+  wClose.addEventListener('click', closeWorks);
+  wClose.addEventListener('mouseenter', () => cursorEl.classList.add('big'));
+  wClose.addEventListener('mouseleave', () => cursorEl.classList.remove('big'));
+
+  document.getElementById('works-btn').addEventListener('click', openWorks);
+}
+
 function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
-function scrollDelta(d) { scrollTarget = clamp01(scrollTarget + d); }
+function scrollDelta(d) {
+  const prev = scrollTarget;
+  scrollTarget = clamp01(scrollTarget + d);
+  if (d > 0 && prev >= 0.998 && scrollTarget >= 0.998) openWorks();
+}
 function scrollJump(v)  { scrollTarget = clamp01(v); }
 
 function updateScroll(dt) {
@@ -1564,10 +1937,11 @@ function updateSections() {
   dots.forEach((d, i) => d.classList.toggle('on', i === sec));
   if (mnum)  mnum.textContent = sec;
   if (mprog) mprog.style.strokeDashoffset = CIRC - CIRC * (sec / 4);
-  const sb = document.getElementById('sb');
-  const tb = document.getElementById('tb');
-  if (sec < 4) { sb.className = 'show'; tb.className = 'hide'; }
-  else          { sb.className = 'hide'; tb.className = 'show'; }
+  const sb   = document.getElementById('sb');
+  const tb   = document.getElementById('tb');
+  const wbtn = document.getElementById('works-btn');
+  if (sec < 4) { sb.className = 'show'; tb.className = 'hide'; wbtn.classList.remove('show'); }
+  else          { sb.className = 'hide'; tb.className = 'show'; if (!worksOpen) wbtn.classList.add('show'); }
 }
 
 // =====================================
@@ -1705,7 +2079,9 @@ document.addEventListener('keydown', e => { if (e.key==='Escape') pvHide(); });
 // イベント
 // =====================================
 window.addEventListener('wheel', e => {
-  if (mOpen) return; e.preventDefault();
+  if (mOpen) return;
+  e.preventDefault();
+  if (worksOpen) { handleWorksScroll(e.deltaY); return; }
   scrollDelta(e.deltaY * 0.00075);
 }, { passive: false });
 
@@ -1713,12 +2089,20 @@ let ty0 = 0;
 window.addEventListener('touchstart', e => { ty0 = e.touches[0].clientY; }, { passive: true });
 window.addEventListener('touchmove', e => {
   if (mOpen) return;
-  scrollDelta((ty0 - e.touches[0].clientY) * 0.0011);
+  const dy = ty0 - e.touches[0].clientY;
   ty0 = e.touches[0].clientY;
+  if (worksOpen) { handleWorksScroll(dy * 1.1); return; }
+  scrollDelta(dy * 0.0011);
 }, { passive: true });
 
 window.addEventListener('keydown', e => {
   if (mOpen) return;
+  if (worksOpen) {
+    if (e.key === 'Escape') closeWorks();
+    if (e.key === 'ArrowDown' || e.key === 'PageDown') handleWorksScroll(120);
+    if (e.key === 'ArrowUp'   || e.key === 'PageUp')   handleWorksScroll(-120);
+    return;
+  }
   if (e.key==='ArrowDown'||e.key==='PageDown') scrollDelta(0.25);
   if (e.key==='ArrowUp'  ||e.key==='PageUp')   scrollDelta(-0.25);
   if (e.key==='End')   scrollJump(1);
@@ -1838,6 +2222,7 @@ async function init() {
     finalMat.uniforms.lensFlareTex.value      = textures.lens || null;
 
     bindCursorHover();
+    initWorks();
     setTimeout(() => { hideLoading(); requestAnimationFrame(loop); }, 400);
   } catch(e) {
     console.error('init error:', e);
