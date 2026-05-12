@@ -6,7 +6,7 @@
 <title>永久×バレット | TOKOSHIE×BULLET</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Noto+Serif+JP:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Noto+Serif+JP:wght@400;700;900&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 ul,li{list-style:none}
@@ -384,188 +384,259 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
 #warn p{font-family:Quantico,sans-serif;font-size:15px;letter-spacing:2px;line-height:1.9;color:var(--white)}
 
 /* ========================
-   WORKS OVERLAY
+   WORKS OVERLAY — production-hasu.work/works/ 精密再現
 ======================== */
 :root{
-  --wbg:rgb(13,13,13);
-  --wfg:rgb(230,230,230);
-  --wred:hsl(350,90%,30%);
+  --wbg:  hsl(0,0%,5%);
+  --wfg:  hsl(0,0%,90%);
+  --wbrd: hsl(0,0%,10%);
+  --wgry: hsl(0,0%,20%);
+  --wlgy: hsl(0,0%,50%);
+  --wred: hsl(350deg,90%,30%);
 }
 #main-canvas{transition:opacity .5s}
-#main-canvas.works-dim{opacity:.18}
+#main-canvas.works-dim{opacity:.15}
 
+/* WORKS entry button */
 #works-btn{
   position:fixed;bottom:48px;right:24px;
   z-index:50;background:none;cursor:none;
   font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:4px;
-  color:rgba(255,255,255,.7);
-  padding:9px 14px;
-  border:1px solid rgba(255,255,255,.22);
+  font-size:9px;letter-spacing:4px;text-transform:uppercase;
+  color:hsl(0,0%,70%);
+  padding:8px 14px;
+  border:1px solid hsl(0,0%,25%);
   opacity:0;pointer-events:none;
-  transition:opacity .35s .15s,color .2s,border-color .2s;
+  transition:opacity .3s cubic-bezier(.3,.1,.1,1),color .2s,border-color .2s;
 }
 #works-btn.show{opacity:1;pointer-events:all}
-#works-btn:hover{color:var(--pink);border-color:var(--pink)}
+#works-btn:hover{color:var(--wred);border-color:var(--wred)}
 
+/* WORKS overlay root */
 #works-overlay{
   position:fixed;inset:0;z-index:100;
   background:var(--wbg);
   display:flex;
   opacity:0;pointer-events:none;
-  transition:opacity .55s cubic-bezier(.4,0,.2,1);
+  transition:opacity .4s cubic-bezier(.3,.1,.1,1);
   overflow:hidden;
+  perspective:500px;
 }
 #works-overlay.open{opacity:1;pointer-events:all}
-#works-overlay::after{
-  content:'';
-  position:absolute;inset:0;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);
-  pointer-events:none;z-index:10;
-}
 
-.works-sidebar{
-  width:186px;flex-shrink:0;
-  border-right:1px solid rgba(230,230,230,.09);
+/* === Sidebar (header column) === */
+.wk-header{
+  width:200px;flex-shrink:0;
+  height:100%;
+  padding:10px;
+  border-right:1px solid var(--wbrd);
   display:flex;flex-direction:column;
   justify-content:space-between;
-  padding:40px 26px;
   position:relative;z-index:2;
 }
-.works-sidebar-label{
+.wk-header-title{
+  display:flex;flex-direction:column;
+  align-items:flex-start;
   font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:4px;
-  color:rgba(230,230,230,.28);
-  writing-mode:vertical-rl;
-  text-orientation:mixed;
-  transform:rotate(180deg);
-  user-select:none;
+  font-size:24px;letter-spacing:-.04em;text-transform:uppercase;
+  color:var(--wfg);
+  line-height:.9;
 }
-.works-close{
+.wk-header-sub{
+  font-family:'Space Mono',monospace;
+  font-size:10px;letter-spacing:0;
+  color:var(--wlgy);
+  margin-top:1em;
+}
+.wk-close{
   background:none;border:none;cursor:none;
   font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:3px;
-  color:rgba(230,230,230,.38);
-  padding:22px 0 0;
+  font-size:10px;letter-spacing:-.04em;text-transform:uppercase;
+  color:var(--wfg);
+  padding:0;
   position:relative;
-  transition:color .2s;
+  transition:color .2s cubic-bezier(.3,.1,.1,1);
   text-align:left;
 }
-.works-close::before,.works-close::after{
-  content:'';position:absolute;top:0;left:50%;
-  width:20px;height:1px;
-  background:rgba(230,230,230,.38);
-  transition:background .2s;
+.wk-close:before{
+  content:'';display:block;
+  width:1rem;height:1px;
+  background:hsl(0,0%,20%);
+  margin-bottom:.5rem;
 }
-.works-close::before{transform:translate(-50%) rotate(-45deg)}
-.works-close::after {transform:translate(-50%) rotate(45deg)}
-.works-close:hover{color:var(--wred)}
-.works-close:hover::before,.works-close:hover::after{background:var(--wred)}
+.wk-close:hover{color:var(--wred)}
 
-.works-list{
-  width:430px;flex-shrink:0;
-  border-right:1px solid rgba(230,230,230,.07);
-  overflow-y:auto;scrollbar-width:none;
+/* === Works list column === */
+.wk-list-wrap{
+  height:100%;overflow:hidden;
+  width:calc(var(--wkcol4));
+  border-right:1px solid var(--wbrd);
+  flex-shrink:0;
   position:relative;z-index:2;
 }
-.works-list::-webkit-scrollbar{display:none}
-.works-list-inner{padding:44px 0 72px}
+.wk-list{
+  display:flex;flex-direction:column;
+  row-gap:100px;
+  padding:10px;
+  overflow-y:auto;
+  height:100%;
+  scrollbar-width:none;
+}
+.wk-list::-webkit-scrollbar{display:none}
 
-.works-item{
-  padding:0 32px;
-  border-bottom:1px solid rgba(230,230,230,.055);
+/* === Individual work item === */
+.wk-item{
   cursor:none;
-  transition:background .22s;
 }
-.works-item:hover{background:rgba(230,230,230,.018)}
-.works-item-row1{
-  display:flex;align-items:center;gap:14px;
-  padding:18px 0 10px;
-}
-.works-item-num{
-  font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:1px;
-  color:rgba(230,230,230,.22);
-  flex-shrink:0;width:22px;
-  transition:color .22s;
-}
-.works-item-thumb{
-  width:140px;height:79px;
-  flex-shrink:0;overflow:hidden;
+.wk-item-row1{
   position:relative;
+  display:flex;
+  justify-content:flex-end;
+  column-gap:10px;
+  height:120px;
 }
-.works-item-thumb img{
-  width:100%;height:100%;object-fit:cover;
-  display:block;
-  filter:grayscale(1) brightness(.85);
-  transition:filter .4s,transform .4s;
+.wk-item-idx{
+  font-family:'Space Mono',monospace;
+  font-weight:400;
+  font-size:10px;
+  color:hsl(0,0%,50%);
+  transition:color .2s cubic-bezier(.3,.1,.1,1);
+  flex-shrink:0;
 }
-.works-item-thumb::after{
+.wk-item-img{
+  position:relative;
+  height:100%;
+  flex-shrink:0;
+  overflow:hidden;
+}
+.wk-item-img::after{
   content:'';
   position:absolute;inset:0;
+  display:block;
   background:var(--wred);
   mix-blend-mode:overlay;
   opacity:0;
-  transition:opacity .4s;
+  transition:opacity .2s cubic-bezier(.3,.1,.1,1);
+}
+.wk-item-img img{
+  width:auto;height:100%;
+  display:block;
+  filter:grayscale(1);
+  transition:filter .2s;
+}
+.wk-item-row2{
+  margin-top:1em;
+}
+.wk-item-title{
+  font-family:'Zen Old Mincho',serif;
+  font-weight:600;
+  font-size:12px;
+  letter-spacing:0;
+  line-height:1;
+  text-align:right;
+  color:var(--wfg);
+  transition:color .2s cubic-bezier(.3,.1,.1,1);
+}
+@media(hover:hover){
+  .wk-item:hover .wk-item-idx   { color:var(--wred) }
+  .wk-item:hover .wk-item-title { color:var(--wred) }
+  .wk-item:hover .wk-item-img::after { opacity:1 }
+}
+.wk-item.is-selected .wk-item-idx,
+.wk-item.is-selected .wk-item-title  { color:var(--wred) }
+.wk-item.is-selected .wk-item-img::after { opacity:1 }
+
+/* === Preview panel === */
+.wk-preview{
+  flex:1;min-width:0;
+  position:relative;
+  z-index:2;
   pointer-events:none;
 }
-.works-item-row2{
-  padding:0 0 16px;
-  text-align:right;
+.wk-preview-img-wrap{
+  position:absolute;
+  right:calc(var(--wkhalfcol) + 10px);
+  top:50%;
+  width:calc(var(--wkcol6));
+  aspect-ratio:1;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(255,255,255,.03) 1px,rgba(255,255,255,.03) 2px);
+  border:1px solid var(--wbrd);
+  transform-origin:right center;
+  transform:rotateY(-8deg) translateY(-50%);
 }
-.works-item-title{
-  font-family:'Noto Serif JP',serif;
-  font-size:10px;letter-spacing:1.5px;
-  color:rgba(230,230,230,.52);
-  line-height:1.85;
-  transition:color .22s;
+/* corner dots */
+.wk-preview-img-wrap::before,
+.wk-preview-img-wrap::after,
+.wk-preview-img-wrap .wk-dot3::before,
+.wk-preview-img-wrap .wk-dot3::after{
+  content:'';position:absolute;display:block;width:10px;height:10px;
 }
-.works-item:hover .works-item-num{color:var(--wred)}
-.works-item:hover .works-item-title{color:var(--wfg)}
-.works-item:hover .works-item-thumb img{filter:grayscale(0) brightness(1);transform:scale(1.06)}
-.works-item:hover .works-item-thumb::after{opacity:.42}
-
-.works-preview{
-  flex:1;min-width:0;
-  position:relative;overflow:hidden;
-  z-index:2;
+.wk-preview-img-wrap::before{
+  left:-1px;top:-1px;
+  border-left:1px solid hsl(0,0%,20%);
+  border-top:1px solid hsl(0,0%,20%);
 }
-.works-preview-img{
+.wk-preview-img-wrap::after{
+  right:-1px;top:-1px;
+  border-right:1px solid hsl(0,0%,20%);
+  border-top:1px solid hsl(0,0%,20%);
+}
+.wk-dot3{position:absolute;right:-1px;bottom:-1px;width:10px;height:10px}
+.wk-dot3::before{
+  content:'';position:absolute;right:0;bottom:0;
+  border-right:1px solid hsl(0,0%,20%);
+  border-bottom:1px solid hsl(0,0%,20%);
+  width:10px;height:10px;
+}
+.wk-dot4{position:absolute;left:-1px;bottom:-1px;width:10px;height:10px}
+.wk-dot4::before{
+  content:'';position:absolute;left:0;bottom:0;
+  border-left:1px solid hsl(0,0%,20%);
+  border-bottom:1px solid hsl(0,0%,20%);
+  width:10px;height:10px;
+}
+.wk-pvimg{
   position:absolute;inset:0;
   width:100%;height:100%;
   object-fit:cover;
+  filter:grayscale(1) brightness(.65);
   opacity:0;
-  transition:opacity .45s cubic-bezier(.4,0,.2,1);
+  transition:opacity .32s cubic-bezier(.3,.1,.1,1);
   pointer-events:none;
 }
-.works-preview-img.active{opacity:1}
-.works-preview-veil{
-  position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(13,13,13,.88) 0%,rgba(13,13,13,.35) 55%,transparent 100%);
-  z-index:1;pointer-events:none;
-}
-.works-preview-label{
-  position:absolute;bottom:44px;left:44px;
-  z-index:3;
-}
-.works-preview-num{
+.wk-pvimg.is-active{opacity:1}
+.wk-preview-title{
+  position:absolute;
+  left:calc(var(--wkhalfcol) + 10px);
+  top:50%;
+  transform-origin:left center;
+  transform:rotateY(16deg) translateY(-50%);
   font-family:'Space Mono',monospace;
-  font-size:9px;letter-spacing:4px;
-  color:rgba(230,230,230,.45);
-  margin-bottom:8px;
+  font-weight:700;
+  font-size:3vw;
+  text-transform:uppercase;
+  letter-spacing:-.04em;
+  white-space:pre-line;
+  line-height:1;
+  color:transparent;
 }
-.works-preview-title{
-  font-family:'Noto Serif JP',serif;
-  font-size:19px;letter-spacing:3px;
+.wk-preview-title::before{
+  content:attr(data-text);
+  position:absolute;left:0;top:0;
+  white-space:pre-line;
   color:var(--wfg);
-  line-height:1.65;
-  text-shadow:0 2px 18px rgba(0,0,0,.75);
+  filter:blur(6px);
+  z-index:-1;
+  pointer-events:none;
 }
-.works-preview-sub{
-  font-family:'Space Mono',monospace;
-  font-size:8px;letter-spacing:3px;
-  color:rgba(230,230,230,.35);
-  margin-top:12px;
+.wk-preview-title::after{
+  content:attr(data-text);
+  position:absolute;left:0;top:0;
+  white-space:pre-line;
+  color:var(--wfg);
+  mask-image:linear-gradient(to bottom,var(--wbg) 0% 50%,hsla(220,5%,3%,.5) 50% 100%);
+  mask-repeat:repeat-y;mask-size:100% 2px;
+  pointer-events:none;
 }
 </style>
 </head>
@@ -682,106 +753,116 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
 <button id="works-btn">WORKS</button>
 
 <div id="works-overlay">
-  <div class="works-sidebar">
-    <span class="works-sidebar-label">WORKS</span>
-    <button class="works-close" id="works-close">CLOSE</button>
+
+  <!-- LEFT: sidebar header -->
+  <div class="wk-header">
+    <div>
+      <div class="wk-header-title">
+        <span>PRODUCTION</span>
+        <span>HASU</span>
+      </div>
+      <p class="wk-header-sub">09 WORKS<br>MV DIRECTION / DESIGN</p>
+    </div>
+    <button class="wk-close">CLOSE</button>
   </div>
 
-  <div class="works-list" id="works-list">
-    <div class="works-list-inner">
+  <!-- CENTER: works list (4 columns) -->
+  <div class="wk-list-wrap">
+    <div class="wk-list" id="wk-list">
 
-      <div class="works-item" data-idx="0">
-        <div class="works-item-row1">
-          <span class="works-item-num">#01</span>
-          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+      <div class="wk-item" data-idx="0">
+        <div class="wk-item-row1">
+          <span class="wk-item-idx">#01</span>
+          <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="works-item-row2"><p class="works-item-title">A Horny Money World<br>~伝説の夜~</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">A Horny Money World~伝説の夜~</p></div>
       </div>
 
-      <div class="works-item" data-idx="1">
-        <div class="works-item-row1">
-          <span class="works-item-num">#02</span>
-          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+      <div class="wk-item" data-idx="1">
+        <div class="wk-item-row1">
+          <span class="wk-item-idx">#02</span>
+          <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="works-item-row2"><p class="works-item-title">宝鐘マリン &amp; こぼ・かなえる<br>III</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン &amp; こぼ・かなえる III</p></div>
       </div>
 
-      <div class="works-item" data-idx="2">
-        <div class="works-item-row1">
-          <span class="works-item-num">#03</span>
-          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+      <div class="wk-item" data-idx="2">
+        <div class="wk-item-row1">
+          <span class="wk-item-idx">#03</span>
+          <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="works-item-row2"><p class="works-item-title">しぐれうい<br>うい麦畑でつかまえて</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">しぐれうい うい麦畑でつかまえて</p></div>
       </div>
 
-      <div class="works-item" data-idx="3">
-        <div class="works-item-row1">
-          <span class="works-item-num">#04</span>
-          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+      <div class="wk-item" data-idx="3">
+        <div class="wk-item-row1">
+          <span class="wk-item-idx">#04</span>
+          <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="works-item-row2"><p class="works-item-title">星街すいせい<br>みちづれ</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">星街すいせい みちづれ</p></div>
       </div>
 
-      <div class="works-item" data-idx="4">
-        <div class="works-item-row1">
-          <span class="works-item-num">#05</span>
-          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+      <div class="wk-item" data-idx="4">
+        <div class="wk-item-row1">
+          <span class="wk-item-idx">#05</span>
+          <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="works-item-row2"><p class="works-item-title">Nornis<br>ジョハリ</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">Nornis ジョハリ</p></div>
       </div>
 
-      <div class="works-item" data-idx="5">
-        <div class="works-item-row1">
-          <span class="works-item-num">#06</span>
-          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/64402d20c70f9a68ce6ab628c6545201b97ff70c-2400x1361.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+      <div class="wk-item" data-idx="5">
+        <div class="wk-item-row1">
+          <span class="wk-item-idx">#06</span>
+          <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/64402d20c70f9a68ce6ab628c6545201b97ff70c-2400x1361.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="works-item-row2"><p class="works-item-title">REALiZE / LiSA<br>covered by ReGLOSS</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">REALiZE / LiSA covered by ReGLOSS</p></div>
       </div>
 
-      <div class="works-item" data-idx="6">
-        <div class="works-item-row1">
-          <span class="works-item-num">#07</span>
-          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+      <div class="wk-item" data-idx="6">
+        <div class="wk-item-row1">
+          <span class="wk-item-idx">#07</span>
+          <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="works-item-row2"><p class="works-item-title">宝鐘マリン<br>真夜中のドア</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン 真夜中のドア</p></div>
       </div>
 
-      <div class="works-item" data-idx="7">
-        <div class="works-item-row1">
-          <span class="works-item-num">#08</span>
-          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+      <div class="wk-item" data-idx="7">
+        <div class="wk-item-row1">
+          <span class="wk-item-idx">#08</span>
+          <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="works-item-row2"><p class="works-item-title">宝鐘マリン<br>め組の人 cover</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン め組の人 cover</p></div>
       </div>
 
-      <div class="works-item" data-idx="8">
-        <div class="works-item-row1">
-          <span class="works-item-num">#09</span>
-          <div class="works-item-thumb"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
+      <div class="wk-item" data-idx="8">
+        <div class="wk-item-row1">
+          <span class="wk-item-idx">#09</span>
+          <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
-        <div class="works-item-row2"><p class="works-item-title">REIN<br>自主制作</p></div>
+        <div class="wk-item-row2"><p class="wk-item-title">REIN 自主制作</p></div>
       </div>
 
     </div>
   </div>
 
-  <div class="works-preview" id="works-preview">
-    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=85&w=1400" alt="" loading="lazy">
-    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=85&w=1400" alt="" loading="lazy">
-    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=85&w=1400" alt="" loading="lazy">
-    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=85&w=1400" alt="" loading="lazy">
-    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=85&w=1400" alt="" loading="lazy">
-    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/64402d20c70f9a68ce6ab628c6545201b97ff70c-2400x1361.png?auto=format&q=85&w=1400" alt="" loading="lazy">
-    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=85&w=1400" alt="" loading="lazy">
-    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=85&w=1400" alt="" loading="lazy">
-    <img class="works-preview-img" src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=85&w=1400" alt="" loading="lazy">
-    <div class="works-preview-veil"></div>
-    <div class="works-preview-label">
-      <p class="works-preview-num" id="wp-num">PRODUCTION HASU</p>
-      <p class="works-preview-title" id="wp-title">SELECTED WORKS</p>
-      <p class="works-preview-sub" id="wp-sub">09 WORKS — MV DIRECTION / DESIGN</p>
+  <!-- RIGHT: preview panel -->
+  <div class="wk-preview">
+    <div class="wk-preview-img-wrap">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=85&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=85&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=85&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=85&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=85&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/64402d20c70f9a68ce6ab628c6545201b97ff70c-2400x1361.png?auto=format&q=85&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=85&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=85&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=85&w=800" alt="" loading="lazy">
+      <div class="wk-dot3"></div>
+      <div class="wk-dot4"></div>
     </div>
+    <div class="wk-preview-title" data-text="SELECTED WORKS">SELECTED WORKS</div>
   </div>
+
 </div>
 
 <script src="assets/three.min.js"></script>
@@ -1804,15 +1885,15 @@ const DAMP = 0.88;
 let worksOpen = false;
 
 const WORKS_DATA = [
-  { num:'#01', title:'A Horny Money World\n~伝説の夜~',       sub:'MV DIRECTION / DESIGN' },
-  { num:'#02', title:'宝鐘マリン & こぼ・かなえる\nIII',     sub:'MV DIRECTION / DESIGN' },
-  { num:'#03', title:'しぐれうい\nうい麦畑でつかまえて',     sub:'MV DIRECTION / DESIGN' },
-  { num:'#04', title:'星街すいせい\nみちづれ',               sub:'MV DIRECTION / DESIGN' },
-  { num:'#05', title:'Nornis\nジョハリ',                     sub:'MV DIRECTION / DESIGN' },
-  { num:'#06', title:'REALiZE / LiSA\ncovered by ReGLOSS',   sub:'MV DIRECTION / DESIGN' },
-  { num:'#07', title:'宝鐘マリン\n真夜中のドア',             sub:'MV DIRECTION / DESIGN' },
-  { num:'#08', title:'宝鐘マリン\nめ組の人 cover',           sub:'MV DIRECTION / DESIGN' },
-  { num:'#09', title:'REIN\n自主制作',                       sub:'VIDEO DIRECTION' },
+  { titleEn:'A Horny\nMoney World\n~legendary\nnight~',        img:'https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=85&w=800' },
+  { titleEn:'Marine &\nKobo\nKanaeru\nIII',                    img:'https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=85&w=800' },
+  { titleEn:'Sigure Ui\nRye\nField\nCatcher',                  img:'https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=85&w=800' },
+  { titleEn:'Suisei\nMichizure',                               img:'https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=85&w=800' },
+  { titleEn:'Nornis\nJohari',                                  img:'https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=85&w=800' },
+  { titleEn:'REALiZE\nLiSA\nby\nReGLOSS',                     img:'https://cdn.sanity.io/images/7b0p5ml9/production/64402d20c70f9a68ce6ab628c6545201b97ff70c-2400x1361.png?auto=format&q=85&w=800' },
+  { titleEn:'Marine\nMidnight\nDoor',                          img:'https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=85&w=800' },
+  { titleEn:'Marine\nMe-gumi\nCover',                          img:'https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=85&w=800' },
+  { titleEn:'REIN\nIndependent\nWork',                         img:'https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=85&w=800' },
 ];
 
 function openWorks() {
@@ -1839,42 +1920,56 @@ function closeWorks() {
 }
 
 function handleWorksScroll(dy) {
-  const list = document.getElementById('works-list');
+  const list = document.getElementById('wk-list');
   if (dy < 0 && list.scrollTop <= 0) { closeWorks(); return; }
   list.scrollTop += dy;
 }
 
+function updateWorksLayout() {
+  const W = window.innerWidth;
+  const margin = 10, gutter = 10, headerW = 200, cols = 12;
+  const col = (W - headerW - 2 * margin - (cols - 1) * gutter) / cols;
+  const s = document.documentElement.style;
+  s.setProperty('--wkcol4', `${4 * col + 3 * gutter + margin}px`);
+  s.setProperty('--wkcol6', `${6 * col + 5 * gutter}px`);
+  s.setProperty('--wkhalfcol', `${col * 0.5}px`);
+}
+
 function initWorks() {
-  const items    = document.querySelectorAll('.works-item');
-  const previewImgs = document.querySelectorAll('.works-preview-img');
-  const wpNum   = document.getElementById('wp-num');
-  const wpTitle = document.getElementById('wp-title');
-  const wpSub   = document.getElementById('wp-sub');
+  updateWorksLayout();
+
+  const pvImgs       = document.querySelectorAll('.wk-pvimg');
+  const items        = document.querySelectorAll('.wk-item');
+  const previewTitle = document.querySelector('.wk-preview-title');
+
+  function showPreview(idx) {
+    pvImgs.forEach((el, j) => el.classList.toggle('is-active', j === idx));
+  }
 
   items.forEach((item, i) => {
     item.addEventListener('mouseenter', () => {
-      previewImgs.forEach((img, j) => img.classList.toggle('active', j === i));
-      const d = WORKS_DATA[i];
-      wpNum.textContent = d.num;
-      wpTitle.innerHTML = d.title.replace('\n', '<br>');
-      wpSub.textContent = d.sub;
+      items.forEach((it, j) => it.classList.toggle('is-selected', j === i));
+      showPreview(i);
+      const t = WORKS_DATA[i].titleEn;
+      previewTitle.textContent = t;
+      previewTitle.setAttribute('data-text', t);
       cursorEl.classList.add('big');
     });
     item.addEventListener('mouseleave', () => {
-      previewImgs.forEach(img => img.classList.remove('active'));
-      wpNum.textContent   = 'PRODUCTION HASU';
-      wpTitle.innerHTML   = 'SELECTED WORKS';
-      wpSub.textContent   = '09 WORKS — MV DIRECTION / DESIGN';
+      items.forEach(it => it.classList.remove('is-selected'));
+      pvImgs.forEach(el => el.classList.remove('is-active'));
       cursorEl.classList.remove('big');
     });
   });
 
-  const wClose = document.getElementById('works-close');
+  const wClose = document.querySelector('.wk-close');
   wClose.addEventListener('click', closeWorks);
   wClose.addEventListener('mouseenter', () => cursorEl.classList.add('big'));
   wClose.addEventListener('mouseleave', () => cursorEl.classList.remove('big'));
 
   document.getElementById('works-btn').addEventListener('click', openWorks);
+  document.getElementById('works-btn').addEventListener('mouseenter', () => cursorEl.classList.add('big'));
+  document.getElementById('works-btn').addEventListener('mouseleave', () => cursorEl.classList.remove('big'));
 }
 
 function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
@@ -2129,6 +2224,7 @@ window.addEventListener('resize', () => {
   bloomVMat.uniforms.resolution.value.set(w>>1, h>>1);
   compositeMat.uniforms.windowAspect.value = w/h;
   finalMat.uniforms.windowAspect.value = w/h;
+  updateWorksLayout();
 });
 
 // =====================================
