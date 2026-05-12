@@ -393,6 +393,10 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
   --wgry: hsl(0,0%,20%);
   --wlgy: hsl(0,0%,50%);
   --wred: hsl(350deg,90%,30%);
+  /* column grid — set by JS updateWorksLayout() */
+  --wkcolumn:92px;
+  --wkgutter:10px;
+  --wkmargin:10px;
 }
 #main-canvas{transition:opacity .5s}
 #main-canvas.works-dim{opacity:.15}
@@ -423,6 +427,41 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
   perspective:500px;
 }
 #works-overlay.open{opacity:1;pointer-events:all}
+
+/* === Opening animations === */
+@keyframes wk-slide-left{
+  from{opacity:0;transform:translateX(-24px)}
+  to  {opacity:1;transform:translateX(0)}
+}
+@keyframes wk-slide-right{
+  from{opacity:0;transform:translateX(24px)}
+  to  {opacity:1;transform:translateX(0)}
+}
+@keyframes wk-item-in{
+  from{opacity:0;transform:translateX(16px)}
+  to  {opacity:1;transform:translateX(0)}
+}
+
+/* Panels enter from their respective sides */
+#works-overlay.open .wk-header{
+  animation:wk-slide-left .5s cubic-bezier(.3,.1,.1,1) .04s both;
+}
+#works-overlay.open .wk-list-wrap{
+  animation:wk-slide-left .5s cubic-bezier(.3,.1,.1,1) .1s both;
+}
+#works-overlay.open .wk-preview{
+  animation:wk-slide-right .6s cubic-bezier(.3,.1,.1,1) .15s both;
+}
+/* Items stagger in based on --i CSS variable */
+#works-overlay.open .wk-item{
+  animation:wk-item-in .45s cubic-bezier(.3,.1,.1,1) both;
+  animation-delay:calc(var(--i,0) * 55ms + 160ms);
+}
+/* Reset state when overlay is closed so animation fires again on next open */
+#works-overlay:not(.open) .wk-header,
+#works-overlay:not(.open) .wk-list-wrap,
+#works-overlay:not(.open) .wk-preview,
+#works-overlay:not(.open) .wk-item{opacity:0}
 
 /* === Sidebar (header column) === */
 .wk-header{
@@ -466,10 +505,10 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
 }
 .wk-close:hover{color:var(--wred)}
 
-/* === Works list column === */
+/* === Works list column (4 columns + 3 gutters + margin) === */
 .wk-list-wrap{
   height:100%;overflow:hidden;
-  width:calc(var(--wkcol4));
+  width:calc(var(--wkcolumn)*4 + var(--wkgutter)*3 + var(--wkmargin));
   border-right:1px solid var(--wbrd);
   flex-shrink:0;
   position:relative;z-index:2;
@@ -525,7 +564,6 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
   width:auto;height:100%;
   display:block;
   filter:grayscale(1);
-  transition:filter .2s;
 }
 .wk-item-row2{
   margin-top:1em;
@@ -549,68 +587,64 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
 .wk-item.is-selected .wk-item-title  { color:var(--wred) }
 .wk-item.is-selected .wk-item-img::after { opacity:1 }
 
-/* === Preview panel === */
+/* === Preview panel (right side, perspective 3D) === */
 .wk-preview{
   flex:1;min-width:0;
   position:relative;
   z-index:2;
   pointer-events:none;
 }
+/* Square image wrap — 6-column width, rotated in 3D */
 .wk-preview-img-wrap{
   position:absolute;
-  right:calc(var(--wkhalfcol) + 10px);
+  right:calc(var(--wkcolumn)*.5 + var(--wkmargin));
   top:50%;
-  width:calc(var(--wkcol6));
+  width:calc(var(--wkcolumn)*6 + var(--wkgutter)*5);
   aspect-ratio:1;
-  background-image:repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(255,255,255,.03) 1px,rgba(255,255,255,.03) 2px);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='8' height='8' fill='none'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(255,255,255,.025) 1px,rgba(255,255,255,.025) 2px);
   border:1px solid var(--wbrd);
   transform-origin:right center;
   transform:rotateY(-8deg) translateY(-50%);
 }
-/* corner dots */
-.wk-preview-img-wrap::before,
-.wk-preview-img-wrap::after,
-.wk-preview-img-wrap .wk-dot3::before,
-.wk-preview-img-wrap .wk-dot3::after{
-  content:'';position:absolute;display:block;width:10px;height:10px;
+/* Corner bracket dots — 4 corners */
+.wk-preview-img-wrap .wk-dot1,.wk-preview-img-wrap .wk-dot2,
+.wk-preview-img-wrap .wk-dot3,.wk-preview-img-wrap .wk-dot4{
+  position:absolute;width:10px;height:10px;
 }
-.wk-preview-img-wrap::before{
-  left:-1px;top:-1px;
-  border-left:1px solid hsl(0,0%,20%);
-  border-top:1px solid hsl(0,0%,20%);
-}
-.wk-preview-img-wrap::after{
-  right:-1px;top:-1px;
-  border-right:1px solid hsl(0,0%,20%);
-  border-top:1px solid hsl(0,0%,20%);
-}
-.wk-dot3{position:absolute;right:-1px;bottom:-1px;width:10px;height:10px}
-.wk-dot3::before{
-  content:'';position:absolute;right:0;bottom:0;
-  border-right:1px solid hsl(0,0%,20%);
-  border-bottom:1px solid hsl(0,0%,20%);
-  width:10px;height:10px;
-}
-.wk-dot4{position:absolute;left:-1px;bottom:-1px;width:10px;height:10px}
-.wk-dot4::before{
-  content:'';position:absolute;left:0;bottom:0;
-  border-left:1px solid hsl(0,0%,20%);
-  border-bottom:1px solid hsl(0,0%,20%);
-  width:10px;height:10px;
-}
+.wk-preview-img-wrap .wk-dot1{left:-1px;top:-1px}
+.wk-preview-img-wrap .wk-dot1::before,.wk-preview-img-wrap .wk-dot1::after{content:'';position:absolute;display:block;width:100%;height:100%}
+.wk-preview-img-wrap .wk-dot1::before{border-left:1px solid var(--wgry)}
+.wk-preview-img-wrap .wk-dot1::after {border-top:1px solid var(--wgry)}
+.wk-preview-img-wrap .wk-dot2{right:-1px;top:-1px}
+.wk-preview-img-wrap .wk-dot2::before,.wk-preview-img-wrap .wk-dot2::after{content:'';position:absolute;display:block;width:100%;height:100%}
+.wk-preview-img-wrap .wk-dot2::before{border-right:1px solid var(--wgry)}
+.wk-preview-img-wrap .wk-dot2::after {border-top:1px solid var(--wgry)}
+.wk-preview-img-wrap .wk-dot3{right:-1px;bottom:-1px}
+.wk-preview-img-wrap .wk-dot3::before,.wk-preview-img-wrap .wk-dot3::after{content:'';position:absolute;display:block;width:100%;height:100%}
+.wk-preview-img-wrap .wk-dot3::before{border-right:1px solid var(--wgry)}
+.wk-preview-img-wrap .wk-dot3::after {border-bottom:1px solid var(--wgry)}
+.wk-preview-img-wrap .wk-dot4{left:-1px;bottom:-1px}
+.wk-preview-img-wrap .wk-dot4::before,.wk-preview-img-wrap .wk-dot4::after{content:'';position:absolute;display:block;width:100%;height:100%}
+.wk-preview-img-wrap .wk-dot4::before{border-left:1px solid var(--wgry)}
+.wk-preview-img-wrap .wk-dot4::after {border-bottom:1px solid var(--wgry)}
+
+/* Preview images (CSS crossfade) */
 .wk-pvimg{
   position:absolute;inset:0;
   width:100%;height:100%;
   object-fit:cover;
   filter:grayscale(1) brightness(.65);
   opacity:0;
-  transition:opacity .32s cubic-bezier(.3,.1,.1,1);
+  transition:opacity .35s cubic-bezier(.3,.1,.1,1);
   pointer-events:none;
 }
 .wk-pvimg.is-active{opacity:1}
+
+/* Preview title — 3D rotated left of image wrap, with blur + scanline effects */
 .wk-preview-title{
   position:absolute;
-  left:calc(var(--wkhalfcol) + 10px);
+  left:calc(var(--wkcolumn)*.5 + var(--wkmargin));
   top:50%;
   transform-origin:left center;
   transform:rotateY(16deg) translateY(-50%);
@@ -623,6 +657,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
   line-height:1;
   color:transparent;
 }
+/* blur glow behind */
 .wk-preview-title::before{
   content:attr(data-text);
   position:absolute;left:0;top:0;
@@ -632,6 +667,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
   z-index:-1;
   pointer-events:none;
 }
+/* scanline mask on top */
 .wk-preview-title::after{
   content:attr(data-text);
   position:absolute;left:0;top:0;
@@ -773,77 +809,77 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
   <div class="wk-list-wrap">
     <div class="wk-list" id="wk-list">
 
-      <a class="wk-item" data-idx="0" href="https://production-hasu.work/works/a-horny-money-world/" target="_blank" rel="noopener">
+      <div class="wk-item" data-idx="0" style="--i:0">
         <div class="wk-item-row1">
           <span class="wk-item-idx">#01</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
         <div class="wk-item-row2"><p class="wk-item-title">A Horny Money World~伝説の夜~</p></div>
-      </a>
+      </div>
 
-      <a class="wk-item" data-idx="1" href="https://production-hasu.work/works/houshou-kobo-iii/" target="_blank" rel="noopener">
+      <div class="wk-item" data-idx="1" style="--i:1">
         <div class="wk-item-row1">
           <span class="wk-item-idx">#02</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
         <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン &amp; こぼ・かなえる III</p></div>
-      </a>
+      </div>
 
-      <a class="wk-item" data-idx="2" href="https://production-hasu.work/works/cacher-in-the-ui/" target="_blank" rel="noopener">
+      <div class="wk-item" data-idx="2" style="--i:2">
         <div class="wk-item-row1">
           <span class="wk-item-idx">#03</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
         <div class="wk-item-row2"><p class="wk-item-title">しぐれうい うい麦畑でつかまえて</p></div>
-      </a>
+      </div>
 
-      <a class="wk-item" data-idx="3" href="https://production-hasu.work/works/michizure/" target="_blank" rel="noopener">
+      <div class="wk-item" data-idx="3" style="--i:3">
         <div class="wk-item-row1">
           <span class="wk-item-idx">#04</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
         <div class="wk-item-row2"><p class="wk-item-title">星街すいせい みちづれ</p></div>
-      </a>
+      </div>
 
-      <a class="wk-item" data-idx="4" href="https://production-hasu.work/works/johari-nornis/" target="_blank" rel="noopener">
+      <div class="wk-item" data-idx="4" style="--i:4">
         <div class="wk-item-row1">
           <span class="wk-item-idx">#05</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
         <div class="wk-item-row2"><p class="wk-item-title">Nornis ジョハリ</p></div>
-      </a>
+      </div>
 
-      <a class="wk-item" data-idx="5" href="https://production-hasu.work/works/realize-regloss/" target="_blank" rel="noopener">
+      <div class="wk-item" data-idx="5" style="--i:5">
         <div class="wk-item-row1">
           <span class="wk-item-idx">#06</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/64402d20c70f9a68ce6ab628c6545201b97ff70c-2400x1361.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
         <div class="wk-item-row2"><p class="wk-item-title">REALiZE / LiSA covered by ReGLOSS</p></div>
-      </a>
+      </div>
 
-      <a class="wk-item" data-idx="6" href="https://production-hasu.work/works/staywithme/" target="_blank" rel="noopener">
+      <div class="wk-item" data-idx="6" style="--i:6">
         <div class="wk-item-row1">
           <span class="wk-item-idx">#07</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
         <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン 真夜中のドア</p></div>
-      </a>
+      </div>
 
-      <a class="wk-item" data-idx="7" href="https://production-hasu.work/works/megumi-marine/" target="_blank" rel="noopener">
+      <div class="wk-item" data-idx="7" style="--i:7">
         <div class="wk-item-row1">
           <span class="wk-item-idx">#08</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
         <div class="wk-item-row2"><p class="wk-item-title">宝鐘マリン め組の人 cover</p></div>
-      </a>
+      </div>
 
-      <a class="wk-item" data-idx="8" href="https://production-hasu.work/works/rein-teaser/" target="_blank" rel="noopener">
+      <div class="wk-item" data-idx="8" style="--i:8">
         <div class="wk-item-row1">
           <span class="wk-item-idx">#09</span>
           <div class="wk-item-img"><img src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=80&h=200" alt="" loading="lazy"></div>
         </div>
         <div class="wk-item-row2"><p class="wk-item-title">REIN 自主制作</p></div>
-      </a>
+      </div>
 
     </div>
   </div>
@@ -860,6 +896,8 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
       <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=85&w=800" alt="" loading="lazy">
       <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=85&w=800" alt="" loading="lazy">
       <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=85&w=800" alt="" loading="lazy">
+      <div class="wk-dot1"></div>
+      <div class="wk-dot2"></div>
       <div class="wk-dot3"></div>
       <div class="wk-dot4"></div>
     </div>
@@ -1933,9 +1971,9 @@ function updateWorksLayout() {
   const margin = 10, gutter = 10, headerW = 200, cols = 12;
   const col = (W - headerW - 2 * margin - (cols - 1) * gutter) / cols;
   const s = document.documentElement.style;
-  s.setProperty('--wkcol4', `${4 * col + 3 * gutter + margin}px`);
-  s.setProperty('--wkcol6', `${6 * col + 5 * gutter}px`);
-  s.setProperty('--wkhalfcol', `${col * 0.5}px`);
+  s.setProperty('--wkcolumn', `${col}px`);
+  s.setProperty('--wkgutter', `${gutter}px`);
+  s.setProperty('--wkmargin', `${margin}px`);
 }
 
 function initWorks() {
