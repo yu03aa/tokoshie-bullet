@@ -6,7 +6,7 @@
 <title>永久×バレット | TOKOSHIE×BULLET</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Noto+Serif+JP:wght@400;700;900&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&family=Noto+Serif+JP:wght@400;700;900&family=Outfit:wght@700&family=Space+Mono:wght@400;700&family=Zen+Old+Mincho:wght@600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 ul,li{list-style:none}
@@ -476,7 +476,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
 .wk-header-title{
   display:flex;flex-direction:column;
   align-items:flex-start;
-  font-family:'Space Mono',monospace;
+  font-family:'Outfit',system-ui,sans-serif;
   font-size:24px;letter-spacing:-.04em;text-transform:uppercase;
   color:var(--wfg);
   line-height:.9;
@@ -601,11 +601,19 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
   top:50%;
   width:calc(var(--wkcolumn)*6 + var(--wkgutter)*5);
   aspect-ratio:1;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='8' height='8' fill='none'/%3E%3C/svg%3E"),
-    repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(255,255,255,.025) 1px,rgba(255,255,255,.025) 2px);
+  background-image:repeating-linear-gradient(transparent,transparent 1px,rgba(255,255,255,.035) 1px,rgba(255,255,255,.035) 2px);
+  background-size:100% 8px;
   border:1px solid var(--wbrd);
   transform-origin:right center;
-  transform:rotateY(-8deg) translateY(-50%);
+  transform:rotateY(-15deg) translateY(-50%);
+}
+/* Canvas overlay for WebGL particle transition */
+.wk-preview-canvas{
+  position:absolute;
+  left:0;top:0;
+  width:100%;height:100%;
+  pointer-events:none;
+  filter:drop-shadow(16px 16px 20px #000);
 }
 /* Corner bracket dots — 4 corners */
 .wk-preview-img-wrap .wk-dot1,.wk-preview-img-wrap .wk-dot2,
@@ -653,7 +661,7 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
   pointer-events:none;
 }
 .wk-preview-heading-main{
-  font-family:'Space Mono',monospace;
+  font-family:'Outfit',system-ui,sans-serif;
   font-size:24px;letter-spacing:-.04em;text-transform:uppercase;
   color:var(--wfg);line-height:.9;
 }
@@ -669,33 +677,33 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
   left:calc(var(--wkcolumn)*.5 + var(--wkmargin));
   top:50%;
   transform-origin:left center;
-  transform:rotateY(16deg) translateY(-50%);
-  font-family:'Space Mono',monospace;
+  transform:rotateY(28deg) translateY(-50%);
+  font-family:'Outfit',system-ui,sans-serif;
   font-weight:700;
   font-size:3vw;
   text-transform:uppercase;
   letter-spacing:-.04em;
   white-space:pre-line;
   line-height:1;
-  color:transparent;
+  color:var(--wfg);
 }
 /* blur glow behind */
 .wk-preview-title::before{
   content:attr(data-text);
+  display:inline-block;
   position:absolute;left:0;top:0;
   white-space:pre-line;
-  color:var(--wfg);
-  filter:blur(6px);
+  filter:blur(4px);
   z-index:-1;
   pointer-events:none;
 }
-/* scanline mask on top */
+/* scanline mask overlay */
 .wk-preview-title::after{
   content:attr(data-text);
+  display:inline-block;
   position:absolute;left:0;top:0;
   white-space:pre-line;
-  color:var(--wfg);
-  mask-image:linear-gradient(to bottom,var(--wbg) 0% 50%,hsla(220,5%,3%,.5) 50% 100%);
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0% 50%,rgba(0,0,0,.3) 50% 100%);
   mask-repeat:repeat-y;mask-size:100% 2px;
   pointer-events:none;
 }
@@ -913,15 +921,28 @@ footer small{font-family:Quantico,sans-serif;font-size:13px;color:var(--gray);te
       <div class="wk-preview-heading-sub">9 Items</div>
     </div>
     <div class="wk-preview-img-wrap">
-      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=85&w=800" alt="" loading="lazy">
-      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=85&w=800" alt="" loading="lazy">
-      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=85&w=800" alt="" loading="lazy">
-      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=85&w=800" alt="" loading="lazy">
-      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=85&w=800" alt="" loading="lazy">
-      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/64402d20c70f9a68ce6ab628c6545201b97ff70c-2400x1361.png?auto=format&q=85&w=800" alt="" loading="lazy">
-      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=85&w=800" alt="" loading="lazy">
-      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=85&w=800" alt="" loading="lazy">
-      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=85&w=800" alt="" loading="lazy">
+      <!-- WebGL particle canvas (production-hasu.work準拠) -->
+      <canvas class="wk-preview-canvas"></canvas>
+      <!-- 画像ソース (WebGLテクスチャ用 + フォールバック) -->
+      <div class="wk-src" data-src="https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=80&w=1920" data-ar="1.7777777777777777"></div>
+      <div class="wk-src" data-src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=80&w=1920" data-ar="2.2857142857142856"></div>
+      <div class="wk-src" data-src="https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=80&w=1920" data-ar="1.8808777429467085"></div>
+      <div class="wk-src" data-src="https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=80&w=1920" data-ar="1.780373831775701"></div>
+      <div class="wk-src" data-src="https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=80&w=1920" data-ar="1.8486905916585838"></div>
+      <div class="wk-src" data-src="https://cdn.sanity.io/images/7b0p5ml9/production/64402d20c70f9a68ce6ab628c6545201b97ff70c-2400x1361.png?auto=format&q=80&w=1920" data-ar="1.763409257898604"></div>
+      <div class="wk-src" data-src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=80&w=1920" data-ar="1.9175108538350216"></div>
+      <div class="wk-src" data-src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=80&w=1920" data-ar="2.0242857142857145"></div>
+      <div class="wk-src" data-src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=80&w=1920" data-ar="1.763409257898604"></div>
+      <!-- CSSフォールバック画像 (canvas失敗時) -->
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=80&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/7e21b0a06b5afbc71401a0fe4ec8e23ceab931f0-2400x1050.png?auto=format&q=80&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/6b2e4c59660e33c0b5d5fca4f107edfa80a468d6-2400x1276.png?auto=format&q=80&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/62621e264e1a5cac2579663c72d692e081c69f26-2286x1284.jpg?auto=format&q=80&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/e2aad5917326eb7ad940752342e9cc013b9c02c5-3812x2062.png?auto=format&q=80&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/64402d20c70f9a68ce6ab628c6545201b97ff70c-2400x1361.png?auto=format&q=80&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/79f0193ae05dd9f1d38d25cc8d6b656c807d64c2-2650x1382.png?auto=format&q=80&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/4a1e91e5273f44c9a5a6161e09f7e40949197a1a-2834x1400.png?auto=format&q=80&w=800" alt="" loading="lazy">
+      <img class="wk-pvimg" src="https://cdn.sanity.io/images/7b0p5ml9/production/f38e51204a56b6cae3a94bfc9a5af47882144782-2400x1361.png?auto=format&q=80&w=800" alt="" loading="lazy">
       <div class="wk-dot1"></div>
       <div class="wk-dot2"></div>
       <div class="wk-dot3"></div>
@@ -1939,6 +1960,58 @@ const vars = {
 };
 
 // =====================================
+// WORKSプレビュー — production-hasu.work完全再現シェーダー
+// =====================================
+// 頂点: tween1(入場)/tween2(退場)でY軸波状Z変位
+const WK_VERT_PREV = `
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+attribute vec3 position;
+attribute vec2 uv;
+uniform float tween1;
+uniform float tween2;
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  vec3 pos = position;
+  float p = pow(uv.y, 2.0);
+  float a1 = clamp((tween1 * 2.0 - p), 0.0, 1.0);
+  float a2 = 1.0 - clamp((tween2 * 2.0 - p), 0.0, 1.0);
+  pos.z -= pow((1.0 - a1), 3.0) * 6.0;
+  pos.z -= pow((1.0 - a2), 3.0) * 6.0;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+}`;
+
+// フラグメント: ランダム粒子散乱 + RGB縦ずれ + グレースケール→カラー遷移
+const WK_FRAG_PREV = `precision highp float;
+uniform sampler2D wkTex;
+uniform float tween1;
+uniform float tween2;
+varying vec2 vUv;
+#define PI 3.141592653589793
+float random(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453123);}
+void main(){
+  vec2 uv = vUv;
+  float p = pow(uv.y, 2.0);
+  float a1 = clamp((tween1 * 2.0 - p), 0.0, 1.0);
+  float a2 = 1.0 - clamp((tween2 * 2.0 - p), 0.0, 1.0);
+  float r1 = random(gl_FragCoord.xy);
+  float r2 = random(gl_FragCoord.xy + vec2(1000.0));
+  float ax = r1 * cos(r2 * 2.0 * PI);
+  float ay = r1 * sin(r2 * 2.0 * PI);
+  uv.x += (1.0 - a1) * 0.1 * ax;
+  uv.y += (1.0 - a1) * 0.1 * ay;
+  float r = texture2D(wkTex, uv + vec2(0.0,  0.05 * (1.0 - a1))).r;
+  float g = texture2D(wkTex, uv).g;
+  float b = texture2D(wkTex, uv + vec2(0.0, -0.05 * (1.0 - a1))).b;
+  vec4 color = vec4(r, g, b, 1.0);
+  float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+  vec4 result = mix(vec4(vec3(gray), 1.0), color, pow(a1, 3.0));
+  result.a *= a1 * a2;
+  gl_FragColor = result;
+}`;
+
+// =====================================
 // スクロール管理
 // =====================================
 let scrollTarget = 0;
@@ -1950,6 +2023,145 @@ const DAMP = 0.88;
 // WORKS
 // =====================================
 let worksOpen = false;
+
+// --- シンプルTweenクラス ---
+class WkTween {
+  constructor() { this.v = 0; this.from = 0; this.to = 0; this.dur = 1; this.elapsed = 0; this.done = true; }
+  start(from, to, dur, ease) {
+    this.from = from; this.to = to; this.dur = dur;
+    this.ease = ease || 'linear';
+    this.elapsed = 0; this.v = from; this.done = false;
+  }
+  update(dt) {
+    if (this.done) return;
+    this.elapsed += dt;
+    let t = Math.min(1, this.elapsed / this.dur);
+    if (this.ease === 'power2.out') t = 1 - (1 - t) * (1 - t);
+    this.v = this.from + (this.to - this.from) * t;
+    if (this.elapsed >= this.dur) this.done = true;
+  }
+}
+
+// --- 1画像1プレーンクラス (production-hasu.work Ix準拠) ---
+class WkImagePlane {
+  constructor(tex, ar, scene) {
+    const w = ar >= 1 ? 95 : 95 * ar;
+    const h = ar >= 1 ? 95 / ar : 95;
+    const geo = new THREE.PlaneGeometry(w, h, 32, 32);
+    this.mat = new THREE.RawShaderMaterial({
+      uniforms: {
+        wkTex:  { value: tex },
+        tween1: { value: 0 },
+        tween2: { value: 0 },
+      },
+      vertexShader:   WK_VERT_PREV,
+      fragmentShader: WK_FRAG_PREV,
+      transparent: true,
+    });
+    this.mesh = new THREE.Mesh(geo, this.mat);
+    this.mesh.visible = false;
+    this.t1 = new WkTween();
+    this.t2 = new WkTween();
+    scene.add(this.mesh);
+  }
+  enter() {
+    this.mesh.visible = true;
+    this.mat.uniforms.tween2.value = 0;
+    this.t2.done = true;
+    this.t1.start(0, 1, 1.6, 'linear');
+  }
+  leave() {
+    this.t2.start(0, 1, 0.9, 'power2.out');
+  }
+  update(dt) {
+    this.t1.update(dt);
+    this.t2.update(dt);
+    this.mat.uniforms.tween1.value = this.t1.v;
+    this.mat.uniforms.tween2.value = this.t2.v;
+    if (this.t2.done && this.t2.v >= 1.0) this.mesh.visible = false;
+  }
+}
+
+// --- WORKSプレビュー WebGLレンダラー (production-hasu.work Ux準拠) ---
+const wkPreview = {
+  renderer: null, scene: null, camera: null,
+  planes: [], prevIdx: -1, isReady: false, container: null,
+
+  init(container) {
+    const canvas = container.querySelector('.wk-preview-canvas');
+    if (!canvas || !window.THREE) return;
+    this.container = container;
+    const W = container.offsetWidth;
+    const H = container.offsetHeight;
+    const CW = Math.round(W * 1.07466829136);
+    const fov = 75;
+    const z = 50 / Math.tan(fov * 0.5 * Math.PI / 180);
+
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(fov, CW / H, 1, 1000);
+    this.camera.position.set(0, 0, z);
+
+    this.renderer = new THREE.WebGLRenderer({
+      canvas, alpha: true, antialias: false, depth: false, stencil: false
+    });
+    this.renderer.setSize(CW, H);
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    this.renderer.setClearColor(0, 0);
+
+    // 非同期でテクスチャ読み込み → 各プレーン生成
+    const loader = new THREE.TextureLoader();
+    loader.crossOrigin = 'anonymous';
+    const srcs = Array.from(container.querySelectorAll('.wk-src'));
+    let loaded = 0;
+    this.planes = new Array(srcs.length).fill(null);
+    srcs.forEach((el, i) => {
+      loader.load(el.dataset.src, (tex) => {
+        tex.minFilter = THREE.LinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        const ar = parseFloat(el.dataset.ar) || 1.777;
+        this.planes[i] = new WkImagePlane(tex, ar, this.scene);
+        if (++loaded === srcs.length) {
+          this.isReady = true;
+          // canvas有効時はフォールバックimgを非表示
+          container.querySelectorAll('.wk-pvimg').forEach(img => img.style.display = 'none');
+        }
+      });
+    });
+  },
+
+  enterImage(idx) {
+    if (!this.isReady) return;
+    if (this.prevIdx >= 0 && this.planes[this.prevIdx]) this.planes[this.prevIdx].leave();
+    if (this.planes[idx]) this.planes[idx].enter();
+    this.prevIdx = idx;
+  },
+
+  leaveImage(idx) {
+    if (!this.isReady || !this.planes[idx]) return;
+    this.planes[idx].leave();
+    this.prevIdx = -1;
+  },
+
+  update(dt) {
+    if (!this.renderer || !this.isReady) return;
+    for (let i = 0; i < this.planes.length; i++) {
+      if (this.planes[i]) this.planes[i].update(dt);
+    }
+    this.renderer.render(this.scene, this.camera);
+  },
+
+  resize() {
+    if (!this.renderer || !this.container) return;
+    const W = this.container.offsetWidth;
+    const H = this.container.offsetHeight;
+    const CW = Math.round(W * 1.07466829136);
+    const fov = 75;
+    this.camera.aspect = CW / H;
+    this.camera.position.z = 50 / Math.tan(fov * 0.5 * Math.PI / 180);
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(CW, H);
+  },
+};
 
 const WORKS_DATA = [
   { titleEn:'A Horny\nMoney World\n~legendary\nnight~',        img:'https://cdn.sanity.io/images/7b0p5ml9/production/8c74d06da844b723c9fbc93888cfa236d70f66fb-1920x1080.png?auto=format&q=85&w=800' },
@@ -2005,25 +2217,34 @@ function updateWorksLayout() {
 function initWorks() {
   updateWorksLayout();
 
+  // WebGLプレビューcanvas初期化
+  const previewWrap = document.querySelector('.wk-preview-img-wrap');
+  if (previewWrap) wkPreview.init(previewWrap);
+
   const pvImgs       = document.querySelectorAll('.wk-pvimg');
   const items        = document.querySelectorAll('.wk-item');
   const previewTitle = document.querySelector('.wk-preview-title');
 
-  function showPreview(idx) {
-    pvImgs.forEach((el, j) => el.classList.toggle('is-active', j === idx));
-  }
+  let hoveredIdx = -1;
 
   items.forEach((item, i) => {
     item.addEventListener('mouseenter', () => {
       items.forEach((it, j) => it.classList.toggle('is-selected', j === i));
-      showPreview(i);
+      // WebGL canvas: 入場エフェクト
+      wkPreview.enterImage(i);
+      // フォールバックCSS img (canvas未準備時)
+      pvImgs.forEach((el, j) => el.classList.toggle('is-active', j === i));
       const t = WORKS_DATA[i].titleEn;
       previewTitle.textContent = t;
       previewTitle.setAttribute('data-text', t);
+      hoveredIdx = i;
       cursorEl.classList.add('big');
     });
     item.addEventListener('mouseleave', () => {
       items.forEach(it => it.classList.remove('is-selected'));
+      // WebGL canvas: 退場エフェクト
+      if (hoveredIdx >= 0) wkPreview.leaveImage(hoveredIdx);
+      hoveredIdx = -1;
       pvImgs.forEach(el => el.classList.remove('is-active'));
       cursorEl.classList.remove('big');
     });
@@ -2292,6 +2513,7 @@ window.addEventListener('resize', () => {
   compositeMat.uniforms.windowAspect.value = w/h;
   finalMat.uniforms.windowAspect.value = w/h;
   updateWorksLayout();
+  wkPreview.resize();
 });
 
 // =====================================
@@ -2307,6 +2529,9 @@ function loop(ts) {
   updateSections();
   updateCursor();
   updateUniforms(time, dt);
+
+  // WORKSプレビューcanvas更新
+  if (worksOpen) wkPreview.update(dt);
 
   // Pass 1: 3Dシーン → sceneRT
   renderer.setRenderTarget(sceneRT);
